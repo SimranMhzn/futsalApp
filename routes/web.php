@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/{any}', function () {
-    return view('app'); // Blade view where React mounts
-})->where('any', '.*');
+Route::get('/', function () {
+    return view('app');
+});
 
 // require __DIR__.'/settings.php';
 // require __DIR__.'/auth.php';
