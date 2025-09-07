@@ -6,14 +6,14 @@ export default function Home() {
       <Navbar/>
 
       <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
-        <section className="text-center py-24 px-4 bg-gradient-to-r from-green-500 to-green-700 text-white">
+        <section className="flex flex-col items-center justify-center text-center py-24 px-4 bg-gradient-to-r from-green-500 to-green-700 text-white">
           <h1 className="text-5xl md:text-6xl font-extrabold mb-4">
             Book Your Futsal Court Instantly
           </h1>
           <p className="text-lg md:text-xl mb-8">
             Find available courts near you and reserve your spot in seconds.
           </p>
-          <Button color="success" size="lg" className="hover:scale-105 transition-transform">
+          <Button color="success" size="lg" className="border-2 border-white hover:scale-105 transition-transform mx-auto">
             Book a Court
           </Button>
         </section>

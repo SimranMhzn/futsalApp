@@ -9,13 +9,14 @@ return new class extends Migration
     {
         Schema::create('futsals', function (Blueprint $table) {
             $table->id();
-            $table->string('futsal'); // Name or description
+            $table->string('futsal'); 
             $table->timestamps();
         });
     }
 
     public function down()
     {
+    
         Schema::dropIfExists('futsals');
     }
 };
