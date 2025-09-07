@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-        public function showRegistrationForm()
+    public function showRegistrationForm()
     {
         return view('auth.register');
     }
@@ -27,12 +27,43 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone'=>$request->phone,
-            'role' => $request->role ?? 'user',
+            'role' => $request->role ?? 'admin',
             'password' => Hash::make($request->password),
         ]);
 
         Auth::login($user);
 
-        return redirect('/');
+        return redirect()->route('futsals.index');
+    }
+
+    public function showLoginForm() {
+        return view('auth.login');
+    }
+
+    public function login(Request $request) {
+        $credential = $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+
+        if (Auth::attempt($credential)) {
+            $request->session()->regenerate();
+
+            if (Auth::user()->role === 'admin') {
+                return redirect()->route('futsals.adminIndex');
+            }
+            return redirect()->route('futsals.index');
+        } else {
+            return back()->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ])->onlyInput('email');
+        }
+    }
+
+    public function logout(Request $request) {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('login.form');
     }
 }

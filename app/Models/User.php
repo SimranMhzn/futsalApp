@@ -48,4 +48,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function futsals()
+    {
+        return $this->hasMany(Futsal::class);
+    }
 }
