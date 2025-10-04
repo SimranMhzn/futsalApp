@@ -1,4 +1,4 @@
-<nav class="bg-green-700 text-white px-4 py-3 shadow flex items-center justify-between">
+{{-- <nav class="bg-green-700 text-white px-4 py-3 shadow flex items-center justify-between">
     <div class="flex items-center space-x-2">
         <img src="/futsalLogo.png" alt="Futsal Logo" class="h-8 w-42 rounded-full" />
     </div>
@@ -16,4 +16,4 @@
             </a>
         </li>
     </ul>
-</nav>
+</nav> --}}

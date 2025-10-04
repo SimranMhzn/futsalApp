@@ -3,7 +3,6 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto mt-8 space-y-8">
-    <!-- logoutbutton -->
     <div>
         <form method="POST" action="{{ route('logout') }}">
         @csrf
@@ -12,8 +11,6 @@
     </div>
 
     <div>
-        <!-- {{ $userCount }} users are registered. -->
-        
         <a href="#" class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
 
         <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ $userCount }}</h5>

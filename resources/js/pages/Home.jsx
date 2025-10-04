@@ -1,4 +1,3 @@
-import React from "react";
 import { Button, Card } from "flowbite-react";
 import Navbar from "./Navbar";
 import {FaFacebook, FaInstagram, FaTwitter} from "react-icons/fa";

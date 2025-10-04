@@ -15,26 +15,85 @@ class AuthController extends Controller
     }
 
     public function register(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => [
+            'required',
+            'string',
+            'email',
+            'max:255',
+            'unique:users',
+            'regex:/^[A-Za-z0-9._%+-]+@gmail\.com$/i', 
+        ],
+        'phone' => 'required|digits:10', 
+        'password' => [
+            'required',
+            'string',
+            'min:8',
+            'confirmed',
+            'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/', 
+        ],
+    ], [
+        'email.regex' => 'Email must be a valid Gmail address (example@gmail.com).',
+        'phone.digits' => 'Phone number must be exactly 10 digits.',
+        'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+    ]);
+
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'phone' => $request->phone,
+        'role' => $request->role ?? 'user',
+        'password' => Hash::make($request->password),
+    ]);
+
+    Auth::login($user);
+
+    return redirect()->route('futsals.index');
+}
+
+    public function showOwnerRegistrationForm()
+        {
+            return view('auth.ownerRegister');
+        }
+    public function ownerRegister(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'phone' =>'required|min:10|numeric',
-            'password' => 'required|string|min:8|confirmed',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                'unique:users',
+                'regex:/^[A-Za-z0-9._%+-]+@gmail\.com$/i', 
+            ],
+            'phone' => 'required|digits:10', 
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/', 
+            ],
+        ], [
+            'email.regex' => 'Email must be a valid Gmail address (example@gmail.com).',
+            'phone.digits' => 'Phone number must be exactly 10 digits.',
+            'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'phone'=>$request->phone,
-            'role' => $request->role ?? 'admin',
+            'phone' => $request->phone,
+            'role' => $request->role ?? 'owner',
             'password' => Hash::make($request->password),
         ]);
 
         Auth::login($user);
 
         return redirect()->route('futsals.index');
-
     }
 
     public function showLoginForm() {

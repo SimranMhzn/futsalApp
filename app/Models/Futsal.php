@@ -19,7 +19,7 @@ class Futsal extends Model
         'price',
         'service',
         'photo',
-        'user_id', // owner (nullable if created by admin)
+        'user_id',
     ];
 
     protected $casts = [
