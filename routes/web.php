@@ -17,6 +17,9 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
+Route::get('/ownerRegister', [AuthController::class, 'showOwnerRegistrationForm'])->name('ownerRegister.form');
+Route::post('/ownerRegister', [AuthController::class, 'ownerRegister'])->name('ownerRegister');
+
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
