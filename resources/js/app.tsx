@@ -1,43 +1,65 @@
-// import '../css/app.css';
-
-// import { createInertiaApp } from '@inertiajs/react';
-// import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-// import { createRoot } from 'react-dom/client';
-// import { initializeTheme } from './hooks/use-appearance';
-
-// const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
-
-// createInertiaApp({
-//     title: (title) => title ? `${title} - ${appName}` : appName,
-//     resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
-//     setup({ el, App, props }) {
-//         const root = createRoot(el);
-
-//         root.render(<App {...props} />);
-//     },
-//     progress: {
-//         color: '#4B5563',
-//     },
-// });
-
-// // This will set light / dark mode on load...
-// initializeTheme();
-
-
-// resources/js/app.jsx
-import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import '../css/app.css';
+import FindFutsal from './pages/FindFutsal';
+import Home from './pages/Home';
+import About from './pages/About';
+
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
-    </BrowserRouter>
-  );
+    return (
+        <>
+            <BrowserRouter>
+                <nav className="flex items-center justify-between bg-emerald-600 px-4 py-3 text-white shadow">
+                    <div className="flex items-center space-x-2">
+                        <img src="/futsalLogo.png" alt="Futsal Logo" className="h-8 w-42 rounded-full" />
+                    </div>
+                    <ul className="flex items-center space-x-6">
+                        <Link className="hover:text-yellow-300" to="/">
+                            Home
+                        </Link>
+                        <Link className="hover:text-yellow-300" to="/findFutsal">
+                            Find Futsal
+                        </Link>
+                        <Link className="hover:text-yellow-300" to="/about">
+                            About
+                        </Link>
+                        <li>
+                            <span className="mx-2 h-6 border-l border-yellow-300"></span>
+                        </li>
+                        <li>
+                            <a href="/login" className="hover:text-yellow-300">
+                                Login
+                            </a>
+                        </li>
+
+                        <li className="group relative">
+                            <button className="rounded bg-yellow-300 px-4 py-1 font-semibold text-green-900 transition hover:bg-yellow-400">
+                                Register
+                            </button>
+                            <ul className="invisible absolute right-0 mt-2 w-48 rounded bg-white text-green-900 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100">
+                                <li>
+                                    <a href="/register" className="block px-4 py-2 hover:bg-yellow-200">
+                                        Register as User
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/ownerRegister" className="block px-4 py-2 hover:bg-yellow-200">
+                                        Register as Owner
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/findFutsal" element={<FindFutsal />} />
+                    <Route path="/about" element={<About />} />
+                </Routes>
+            </BrowserRouter>                                                
+        </>
+    );
 }
 
-ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
-
+ReactDOM.createRoot(document.getElementById('root')!).render(<App />);
