@@ -9,7 +9,7 @@ function App() {
     return (
         <>
             <BrowserRouter>
-                <nav className="flex items-center justify-between bg-emerald-600 px-4 py-3 text-white shadow">
+                <nav className="flex items-center justify-between bg-emerald-600 px-4 py-3 text-white shadow relative z-50">
                     <div className="flex items-center space-x-2">
                         <img src="/futsalLogo.png" alt="Futsal Logo" className="h-8 w-42 rounded-full" />
                     </div>

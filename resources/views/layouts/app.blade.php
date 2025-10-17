@@ -16,7 +16,6 @@
     </script>
 </head>
 <body class="bg-gray-300 dark:bg-gray-500">
-    @include('components.navbar')
     @yield('content')
 
     <div id="root"></div>
