@@ -39,13 +39,26 @@
                 placeholder="Enter your 10-digit contact number" required />
         </div>
 
+        <!-- Password field -->
         <div class="mb-3 relative">
             <label for="password" class="block mb-2 text-sm font-semibold text-green-900">Password</label>
             <input type="password" id="password" name="password" 
                 class="bg-white border border-green-300 text-green-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 pr-10" 
                 placeholder="Create your password" required />
 
-            <span onclick="togglePassword('password')" class="absolute right-3 top-9 cursor-pointer text-green-700">👁</span>
+            <!-- Eye icon -->
+            <span id="togglePassword" class="absolute right-3 top-9 cursor-pointer text-green-700">
+                <!-- open-eye SVG -->
+                <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5
+                        c4.477 0 8.268 2.943 9.542 7
+                        -1.274 4.057-5.065 7-9.542 7
+                        -4.477 0-8.268-2.943-9.542-7z" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+            </span>
 
             <div class="mt-2 w-full h-1 bg-gray-200 rounded">
                 <div id="password-strength" class="h-1 rounded"></div>
@@ -53,13 +66,25 @@
             <p id="password-strength-text" class="mt-1 text-sm"></p>
         </div>
 
+        <!-- Confirm Password field -->
         <div class="mb-3 relative">
             <label for="password_confirmation" class="block mb-2 text-sm font-semibold text-green-900">Confirm Password</label>
             <input type="password" id="password_confirmation" name="password_confirmation"
                 class="bg-white border border-green-300 text-green-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 pr-10"
                 placeholder="Confirm your password" required />
 
-            <span onclick="togglePassword('password_confirmation')" class="absolute right-3 top-9 cursor-pointer text-green-700">👁</span>
+            <span id="toggleConfirmPassword" class="absolute right-3 top-9 cursor-pointer text-green-700">
+                <!-- open-eye SVG -->
+                <svg id="confirmEyeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5
+                        c4.477 0 8.268 2.943 9.542 7
+                        -1.274 4.057-5.065 7-9.542 7
+                        -4.477 0-8.268-2.943-9.542-7z" />
+                    <circle cx="12" cy="12" r="3" />
+                </svg>
+            </span>
 
             <p id="password-match-text" class="mt-1 text-sm"></p>
         </div>
@@ -73,11 +98,52 @@
 </div>
 
 <script>
-function togglePassword(id) {
+// SVGs for both icons
+const openEye = `
+<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'
+ stroke-width='2' stroke='currentColor' class='w-5 h-5'>
+ <path stroke-linecap='round' stroke-linejoin='round'
+ d='M2.458 12C3.732 7.943 7.523 5 12 5
+ c4.477 0 8.268 2.943 9.542 7
+ -1.274 4.057-5.065 7-9.542 7
+ -4.477 0-8.268-2.943-9.542-7z' />
+ <circle cx='12' cy='12' r='3' />
+</svg>`;
+
+const closedEye = `
+<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'
+ stroke-width='2' stroke='currentColor' class='w-5 h-5'>
+ <path stroke-linecap='round' stroke-linejoin='round'
+ d='M3 3l18 18M9.88 9.88A3 3 0 0114.12 14.12M12 5
+ c4.477 0 8.268 2.943 9.542 7a10.056 10.056 0 01-1.614 2.73M6.708 6.708
+ A10.056 10.056 0 002.458 12
+ c1.274 4.057 5.065 7 9.542 7
+ 1.368 0 2.677-.23 3.885-.654' />
+</svg>`;
+
+// Toggle password visibility
+function togglePassword(id, iconId) {
     const input = document.getElementById(id);
-    input.type = input.type === "password" ? "text" : "password";
+    const icon = document.getElementById(iconId);
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.innerHTML = closedEye;
+    } else {
+        input.type = "password";
+        icon.innerHTML = openEye;
+    }
 }
 
+document.getElementById("togglePassword").addEventListener("click", () => {
+    togglePassword("password", "eyeIcon");
+});
+
+document.getElementById("toggleConfirmPassword").addEventListener("click", () => {
+    togglePassword("password_confirmation", "confirmEyeIcon");
+});
+
+// Password strength and match
 const password = document.getElementById("password");
 const confirmPassword = document.getElementById("password_confirmation");
 const strengthBar = document.getElementById("password-strength");
@@ -112,10 +178,10 @@ password.addEventListener("input", () => {
 
 confirmPassword.addEventListener("input", () => {
     if (confirmPassword.value === password.value) {
-        matchText.textContent = "Passwords match ";
+        matchText.textContent = "Passwords match";
         matchText.className = "text-green-600 text-sm";
     } else {
-        matchText.textContent = "Passwords do not match ";
+        matchText.textContent = "Passwords do not match";
         matchText.className = "text-red-600 text-sm";
     }
 });
