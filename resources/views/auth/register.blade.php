@@ -39,16 +39,13 @@
                 placeholder="Enter your 10-digit contact number" required />
         </div>
 
-        <!-- Password field -->
         <div class="mb-3 relative">
             <label for="password" class="block mb-2 text-sm font-semibold text-green-900">Password</label>
             <input type="password" id="password" name="password" 
                 class="bg-white border border-green-300 text-green-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 pr-10" 
                 placeholder="Create your password" required />
 
-            <!-- Eye icon -->
             <span id="togglePassword" class="absolute right-3 top-9 cursor-pointer text-green-700">
-                <!-- open-eye SVG -->
                 <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke-width="2" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -66,7 +63,6 @@
             <p id="password-strength-text" class="mt-1 text-sm"></p>
         </div>
 
-        <!-- Confirm Password field -->
         <div class="mb-3 relative">
             <label for="password_confirmation" class="block mb-2 text-sm font-semibold text-green-900">Confirm Password</label>
             <input type="password" id="password_confirmation" name="password_confirmation"
@@ -74,7 +70,6 @@
                 placeholder="Confirm your password" required />
 
             <span id="toggleConfirmPassword" class="absolute right-3 top-9 cursor-pointer text-green-700">
-                <!-- open-eye SVG -->
                 <svg id="confirmEyeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke-width="2" stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -98,7 +93,6 @@
 </div>
 
 <script>
-// SVGs for both icons
 const openEye = `
 <svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'
  stroke-width='2' stroke='currentColor' class='w-5 h-5'>
@@ -121,7 +115,6 @@ const closedEye = `
  1.368 0 2.677-.23 3.885-.654' />
 </svg>`;
 
-// Toggle password visibility
 function togglePassword(id, iconId) {
     const input = document.getElementById(id);
     const icon = document.getElementById(iconId);
@@ -143,7 +136,6 @@ document.getElementById("toggleConfirmPassword").addEventListener("click", () =>
     togglePassword("password_confirmation", "confirmEyeIcon");
 });
 
-// Password strength and match
 const password = document.getElementById("password");
 const confirmPassword = document.getElementById("password_confirmation");
 const strengthBar = document.getElementById("password-strength");

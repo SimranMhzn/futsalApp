@@ -1,7 +1,13 @@
 import { Button, Card } from 'flowbite-react';
+import FeaturedFutsals from "../components/FeaturedFutsals";
 import { FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
 import { MdLocationOn, MdOutlineAccessTimeFilled, MdVerified } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 export default function Home() {
+    const navigate = useNavigate();
+    const handleFindFutsals = () => {
+        navigate('/futsals');
+    }
     return (
         <>
             <div>
@@ -12,7 +18,7 @@ export default function Home() {
                             Find available courts near you and reserve your spot in seconds. No hassle, no waiting.
                         </p>
                     </div>
-                    <Button className="w-40 rounded-xl border-2 border-white p-2.5 transition-transform hover:scale-105">Find Futsals Now</Button>
+                    <Button onClick={handleFindFutsals} className="w-40 rounded-xl border-2 border-white p-2.5 transition-transform hover:scale-105">Find Futsals Now</Button>
                 </section>
 
                 <section className="mx-auto max-w-6xl px-4 py-20">
@@ -50,6 +56,8 @@ export default function Home() {
                     </div>
                 </section>
 
+                <FeaturedFutsals onFindFutsals={handleFindFutsals} />
+
                 <section className="bg-gray-50 px-6 py-20 dark:bg-gray-800">
                     <h2 className="mb-16 text-center text-4xl font-semibold text-gray-900 dark:text-white">How It Works</h2>
                     <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 md:grid-cols-3">
@@ -84,7 +92,7 @@ export default function Home() {
                     </div>
 
                     <div className="mt-14 flex justify-center">
-                        <Button className="rounded-xl bg-green-600 px-6 py-3 font-semibold text-white shadow-md transition-transform hover:scale-105 hover:bg-green-700">
+                        <Button onClick={handleFindFutsals} className="rounded-xl bg-green-600 px-6 py-3 font-semibold text-white shadow-md transition-transform hover:scale-105 hover:bg-green-700">
                             Find a Court Now
                         </Button>
                     </div>
@@ -99,7 +107,7 @@ export default function Home() {
                         Fast, easy, and reliable.
                     </p>
                     <div className="flex justify-center gap-4">
-                        <Button color="light" className="font-bold">
+                        <Button onClick={handleFindFutsals} color="light" className="font-bold">
                             Browse Futsals
                         </Button>
                         <Button color="light" className="border-2 border-white font-bold">

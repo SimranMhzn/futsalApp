@@ -1,15 +1,15 @@
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import '../css/app.css';
+import Blog from './pages/Blog';
 import FindFutsal from './pages/FindFutsal';
 import Home from './pages/Home';
-import About from './pages/About';
 
 function App() {
     return (
         <>
             <BrowserRouter>
-                <nav className="flex items-center justify-between bg-emerald-600 px-4 py-3 text-white shadow relative z-50">
+                <nav className="relative z-50 flex items-center justify-between bg-emerald-600 px-4 py-3 text-white shadow">
                     <div className="flex items-center space-x-2">
                         <img src="/futsalLogo.png" alt="Futsal Logo" className="h-8 w-42 rounded-full" />
                     </div>
@@ -17,11 +17,11 @@ function App() {
                         <Link className="hover:text-yellow-300" to="/">
                             Home
                         </Link>
-                        <Link className="hover:text-yellow-300" to="/findFutsal">
+                        <Link className="hover:text-yellow-300" to="/futsals">
                             Find Futsal
                         </Link>
-                        <Link className="hover:text-yellow-300" to="/about">
-                            About
+                        <Link className="hover:text-yellow-300" to="/blog">
+                            Blog
                         </Link>
                         <li>
                             <span className="mx-2 h-6 border-l border-yellow-300"></span>
@@ -54,10 +54,10 @@ function App() {
 
                 <Routes>
                     <Route path="/" element={<Home />} />
-                    <Route path="/findFutsal" element={<FindFutsal />} />
-                    <Route path="/about" element={<About />} />
+                    <Route path="/futsals" element={<FindFutsal />} />
+                    <Route path="/blog" element={<Blog />} />
                 </Routes>
-            </BrowserRouter>                                                
+            </BrowserRouter>
         </>
     );
 }
