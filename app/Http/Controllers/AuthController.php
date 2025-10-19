@@ -93,7 +93,7 @@ class AuthController extends Controller
 
     Auth::login($user);
 
-    return redirect()->route('futsals.index');
+    return redirect('/');
     }
 
     public function showLoginForm() {
@@ -112,7 +112,7 @@ class AuthController extends Controller
             if (Auth::user()->role === 'admin') {
                 return redirect()->route('futsals.adminIndex');
             }
-            return redirect()->route('futsals.index');
+            return redirect('/');
         } else {
             return back()->withErrors([
                 'email' => 'The provided credentials do not match our records.',
