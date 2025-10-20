@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaSearch, FaFilter } from "react-icons/fa";
+import { FaSearch} from "react-icons/fa";
 
 export default function Blog() {
   const [searchTerm, setSearchTerm] = useState("");
