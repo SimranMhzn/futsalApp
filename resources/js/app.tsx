@@ -32,23 +32,11 @@ function App() {
                             </a>
                         </li>
 
-                        <li className="group relative">
+                        <a href="/register">
                             <button className="rounded bg-yellow-300 px-4 py-1 font-semibold text-green-900 transition hover:bg-yellow-400">
                                 Register
                             </button>
-                            <ul className="invisible absolute right-0 mt-2 w-48 rounded bg-white text-green-900 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100">
-                                <li>
-                                    <a href="/register" className="block px-4 py-2 hover:bg-yellow-200">
-                                        Register as User
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/ownerRegister" className="block px-4 py-2 hover:bg-yellow-200">
-                                        Register as Owner
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                        </a>
                     </ul>
                 </nav>
 
