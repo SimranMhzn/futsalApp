@@ -47,57 +47,105 @@ class FutsalController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'phone'       => 'nullable|string|max:20',
+            'price'       => 'nullable|numeric',
+            'location'    => 'nullable|string|max:255',
+            'link'        => 'nullable|url',
+            'side_no'     => 'nullable|integer',
+            'ground_no'   => 'nullable|integer',
+            'description' => 'nullable|string',
+            'photo.*'     => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
         ]);
 
-        Futsal::create([
-            'name'     => $request->name,
-            'location' => $request->location,
-            'description' => $request->description,
-            'phone'    => $request->phone,
-            'price'    => $request->price,
-            'service'  => $request->service,
-            'photo'    => $request->photo,
-            'user_id'  => Auth::id(), // link to owner
-        ]);
+        $futsal = new Futsal($validated);
+        $futsal->user_id = Auth::id();
 
-        return redirect()->route('futsals.index');
+        // ✅ Handle amenities (checkboxes → booleans)
+        $futsal->shower_facility = $request->has('shower_facility');
+        $futsal->parking_space   = $request->has('parking_space');
+        $futsal->changing_room   = $request->has('changing_room');
+        $futsal->restaurant      = $request->has('restaurant');
+        $futsal->wifi            = $request->has('wifi');
+        $futsal->open_ground     = $request->has('open_ground');
+
+        // ✅ Handle photo uploads (multiple)
+        if ($request->hasFile('photo')) {
+            $photos = [];
+            foreach ($request->file('photo') as $file) {
+                $path = $file->store('futsal_photos', 'public');
+                $photos[] = asset('storage/' . $path);
+            }
+            $futsal->photo = $photos;
+        }
+
+        $futsal->save();
+
+        return redirect()->route('futsals.index')->with('success', 'Futsal registered successfully.');
     }
 
+    /**
+     * Edit futsal details.
+     */
     public function edit(string $id)
     {
         $futsal = Futsal::findOrFail($id);
         return view('futsals.edit', compact('futsal'));
     }
 
+    /**
+     * Update futsal details.
+     */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'phone'       => 'nullable|string|max:20',
+            'price'       => 'nullable|numeric',
+            'location'    => 'nullable|string|max:255',
+            'link'        => 'nullable|url',
+            'side_no'     => 'nullable|integer',
+            'ground_no'   => 'nullable|integer',
+            'description' => 'nullable|string',
+            'photo.*'     => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
         ]);
 
         $futsal = Futsal::findOrFail($id);
+        $futsal->fill($validated);
 
-        $futsal->update([
-            'name'        => $request->name,
-            'location'    => $request->location,
-            'description' => $request->description,
-            'phone'       => $request->phone,
-            'price'       => $request->price,
-            'service'     => $request->service,
-            'photo'       => $request->photo,
-        ]);
+        // ✅ Update amenities
+        $futsal->shower_facility = $request->has('shower_facility');
+        $futsal->parking_space   = $request->has('parking_space');
+        $futsal->changing_room   = $request->has('changing_room');
+        $futsal->restaurant      = $request->has('restaurant');
+        $futsal->wifi            = $request->has('wifi');
+        $futsal->open_ground     = $request->has('open_ground');
 
-        return redirect()->route('futsals.index');
+        // ✅ Update photos
+        if ($request->hasFile('photo')) {
+            $photos = [];
+            foreach ($request->file('photo') as $file) {
+                $path = $file->store('futsal_photos', 'public');
+                $photos[] = asset('storage/' . $path);
+            }
+            $futsal->photo = $photos;
+        }
+
+        $futsal->save();
+
+        return redirect()->route('futsals.index')->with('success', 'Futsal updated successfully.');
     }
 
+    /**
+     * Delete futsal.
+     */
     public function destroy(string $id)
     {
         $futsal = Futsal::findOrFail($id);
         $futsal->delete();
 
-        return redirect()->route('futsals.index');
+        return redirect()->route('futsals.index')->with('success', 'Futsal deleted successfully.');
     }
 
     /**
@@ -112,7 +160,7 @@ class FutsalController extends Controller
 
         Booking::create([
             'futsal_id' => $futsalId,
-            'user_id'   => Auth::id(), // player
+            'user_id'   => Auth::id(),
             'date'      => $request->date,
             'time'      => $request->time,
             'status'    => 'booked',
