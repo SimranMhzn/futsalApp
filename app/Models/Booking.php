@@ -9,23 +9,22 @@ class Booking extends Model
 {
     use HasFactory;
 
-    protected $table = 'bookings';
-
     protected $fillable = [
         'futsal_id',
-        'user_id',   // the player who booked
+        'user_id',
         'date',
         'time',
         'status',
     ];
 
-    public function player()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
     public function futsal()
     {
         return $this->belongsTo(Futsal::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
+
