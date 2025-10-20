@@ -110,9 +110,6 @@ export default function Home() {
                         <Button onClick={handleFindFutsals} color="light" className="font-bold">
                             Browse Futsals
                         </Button>
-                        <Button color="light" className="border-2 border-white font-bold">
-                            Create Free Account
-                        </Button>
                     </div>
                 </div>
             </div>
