@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="mt-8 flex flex-col items-center">
-    <form class="max-w-md w-full bg-green-50 p-8 rounded-xl shadow-lg" action="{{ route('login') }}" method="POST">
+    <form id="loginForm" class="max-w-md w-full bg-green-50 p-8 rounded-xl shadow-lg" action="{{ route('login') }}" method="POST">
         @csrf
         <div class="mb-5">
             <label for="email" class="block mb-2 text-sm font-semibold text-green-900">Email Address</label>
@@ -21,4 +21,45 @@
         <a href="/register" class="text-green-700 hover:underline font-semibold">Register here</a>
     </div>
 </div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+    const data = {
+        email: formData.get('email'),
+        password: formData.get('password'),
+        _token: formData.get('_token')
+    };
+
+    try {
+        const res = await fetch("{{ route('login') }}", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+            // Save user info in localStorage for React navbar
+            localStorage.setItem('user', JSON.stringify(result.user));
+            localStorage.setItem('token', 'session'); // placeholder for session
+
+            // Redirect to home
+            window.location.href = "/";
+        } else {
+            alert(result.message || 'Login failed');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('An error occurred. Please try again.');
+    }
+});
+</script>
 @endsection

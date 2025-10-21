@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaSearch} from "react-icons/fa";
+import AddFutsalPage from '../components/AddFutsalPage';
 
 export default function Blog() {
   const [searchTerm, setSearchTerm] = useState("");

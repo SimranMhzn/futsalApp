@@ -1,11 +1,12 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FutsalController;
-use Illuminate\Support\Facades\Route;
 
+// Public routes
 Route::get('/', function () {
-    return view('app');
+    return view('app'); // Your main React app
 });
 
 Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register.form');
@@ -16,18 +17,15 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Protected routes for logged-in users
 Route::middleware(['auth'])->group(function () {
-    Route::get('/futsals', [FutsalController::class, 'index'])->name('futsals.index');
-    Route::get('/my-bookings', [FutsalController::class, 'myBookings'])->name('bookings.index');
-    Route::post('/futsals/{futsal}/book', [FutsalController::class, 'book'])->name('futsals.book');
-    Route::middleware('owner')->group(function () {
-        Route::post('/futsals', [FutsalController::class, 'store'])->name('futsals.store');
-        Route::get('/futsals/{id}/edit', [FutsalController::class, 'edit'])->name('futsals.edit');
-        Route::put('/futsals/{id}', [FutsalController::class, 'update'])->name('futsals.update');
-        Route::delete('/futsals/{id}', [FutsalController::class, 'destroy'])->name('futsals.destroy');
-    });
-});
 
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/futsals', [FutsalController::class, 'adminIndex'])->name('futsals.adminIndex');
+    // Return all futsals for the logged-in user as JSON
+    Route::get('/futsals', [FutsalController::class, 'index'])->name('futsals.index');
+
+    // Other futsal actions...
+    Route::post('/futsals', [FutsalController::class, 'store'])->name('futsals.store');
+    Route::get('/futsals/{id}/edit', [FutsalController::class, 'edit'])->name('futsals.edit');
+    Route::put('/futsals/{id}', [FutsalController::class, 'update'])->name('futsals.update');
+    Route::delete('/futsals/{id}', [FutsalController::class, 'destroy'])->name('futsals.destroy');
 });

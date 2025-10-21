@@ -1,13 +1,16 @@
 import { Button, Card } from 'flowbite-react';
-import FeaturedFutsals from "../components/FeaturedFutsals";
 import { FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
 import { MdLocationOn, MdOutlineAccessTimeFilled, MdVerified } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
+import FeaturedFutsals from '../components/FeaturedFutsals';
 export default function Home() {
     const navigate = useNavigate();
     const handleFindFutsals = () => {
         navigate('/futsals');
-    }
+    };
+    const handleAddFutsal = () => {
+        navigate('/addFutsal');
+    };
     return (
         <>
             <div>
@@ -18,7 +21,9 @@ export default function Home() {
                             Find available courts near you and reserve your spot in seconds. No hassle, no waiting.
                         </p>
                     </div>
-                    <Button onClick={handleFindFutsals} className="w-40 rounded-xl border-2 border-white p-2.5 transition-transform hover:scale-105">Find Futsals Now</Button>
+                    <Button onClick={handleFindFutsals} className="w-40 rounded-xl border-2 border-white p-2.5 transition-transform hover:scale-105">
+                        Find Futsals Now
+                    </Button>
                 </section>
 
                 <section className="mx-auto max-w-6xl px-4 py-20">
@@ -92,7 +97,10 @@ export default function Home() {
                     </div>
 
                     <div className="mt-14 flex justify-center">
-                        <Button onClick={handleFindFutsals} className="rounded-xl bg-green-600 px-6 py-3 font-semibold text-white shadow-md transition-transform hover:scale-105 hover:bg-green-700">
+                        <Button
+                            onClick={handleFindFutsals}
+                            className="rounded-xl bg-green-600 px-6 py-3 font-semibold text-white shadow-md transition-transform hover:scale-105 hover:bg-green-700"
+                        >
                             Find a Court Now
                         </Button>
                     </div>
@@ -113,6 +121,18 @@ export default function Home() {
                     </div>
                 </div>
             </div>
+            <section className="px-6 py-16 text-center dark:bg-gray-700">
+                <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">Are you a Futsal Owner?</h2>
+                <p className="mb-8 text-gray-700 dark:text-gray-300">Register your futsal and start getting bookings from players near you!</p>
+                <div className="flex justify-center gap-4">
+                    <Button
+                        onClick={handleAddFutsal}
+                        className="rounded-xl bg-green-600 px-6 py-3 font-semibold text-white shadow-md transition-transform hover:scale-105 hover:bg-green-700"
+                    >
+                        Register Your Futsal
+                    </Button>
+                </div>
+            </section>
             <footer className="bg-green-900 px-8 py-10">
                 <div className="grid grid-cols-1 gap-8 text-gray-200 md:grid-cols-3">
                     <div>

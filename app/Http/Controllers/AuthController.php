@@ -58,24 +58,25 @@ class AuthController extends Controller
     }
 
     public function login(Request $request) {
-        $credential = $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
+    $credentials = $request->validate([
+        'email' => 'required|string|email',
+        'password' => 'required|string',
+    ]);
+
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+
+        return response()->json([
+            'success' => true,
+            'user' => Auth::user()
         ]);
-
-        if (Auth::attempt($credential)) {
-            $request->session()->regenerate();
-
-            if (Auth::user()->role === 'admin') {
-                return redirect()->route('futsals.adminIndex');
-            }
-            return redirect('/');
-        } else {
-            return back()->withErrors([
-                'email' => 'The provided credentials do not match our records.',
-            ])->onlyInput('email');
-        }
     }
+
+    return response()->json([
+        'success' => false,
+        'message' => 'Invalid credentials'
+    ], 401);
+}
 
     public function logout(Request $request) {
         Auth::logout();

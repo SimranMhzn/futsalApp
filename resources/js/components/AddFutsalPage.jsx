@@ -1,229 +1,291 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const AddFutsalPage = () => {
   const [formData, setFormData] = useState({
-    futsalName: "",
+    name: "",
     phone: "",
     price: "",
     location: "",
-    mapLink: "",
-    aSide: "",
-    grounds: "",
-    amenities: [],
+    link: "",
+    side_no: "",
+    ground_no: "",
+    description: "",
+    shower_facility: false,
+    parking_space: false,
+    changing_room: false,
+    restaurant: false,
+    wifi: false,
+    open_ground: false,
   });
 
   const [images, setImages] = useState(Array(5).fill(null));
+  const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // handle input changes
+  const validateField = (name, value) => {
+    let message = "";
+
+    switch (name) {
+      case "name":
+        if (!value.trim()) message = "Futsal name is required.";
+        break;
+      case "phone":
+        if (!/^\d{10}$/.test(value)) message = "Phone number must be 10 digits.";
+        break;
+      case "price":
+        if (value <= 500) message = "Price must be more than 500.";
+        break;
+      case "side_no":
+      case "ground_no":
+        if (value < 0) message = "Value cannot be negative.";
+        break;
+      case "link":
+        if (value && !/^https?:\/\/.+/.test(value)) message = "Invalid URL.";
+        break;
+      default:
+        break;
+    }
+
+    setErrors((prev) => ({ ...prev, [name]: message }));
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    validateField(name, value);
   };
 
-  // handle checkbox toggle
   const handleAmenityChange = (e) => {
-    const { value, checked } = e.target;
-    setFormData((prev) => {
-      const amenities = checked
-        ? [...prev.amenities, value]
-        : prev.amenities.filter((a) => a !== value);
-      return { ...prev, amenities };
-    });
+    const { name, checked } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: checked }));
   };
 
-  // handle image uploads
   const handleImageUpload = (index, file) => {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("❌ Only images allowed!");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      alert("❌ Max 2MB per image!");
+      return;
+    }
+
     const newImages = [...images];
-    newImages[index] = URL.createObjectURL(file);
+    newImages[index] = file;
     setImages(newImages);
   };
 
-  // handle form submission
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const newErrors = {};
+    Object.entries(formData).forEach(([key, value]) => validateField(key, value));
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted data:", formData);
-    alert("Form submitted successfully!");
+    setServerError("");
+    if (!validateForm()) return;
+
+    setLoading(true);
+    try {
+      const data = new FormData();
+
+      // Append text + boolean fields
+      Object.entries(formData).forEach(([key, value]) => {
+        data.append(key, value);
+      });
+
+      // Append image files
+      images.forEach((img) => {
+        if (img) data.append("photo[]", img);
+      });
+
+      // ✅ Send cookies for Laravel session authentication
+      const response = await axios.post("http://localhost:8000/futsals", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true, // crucial for Auth::id() to work in Laravel
+      });
+
+      alert("✅ Futsal registered successfully!");
+
+      // Reset form
+      setFormData({
+        name: "",
+        phone: "",
+        price: "",
+        location: "",
+        link: "",
+        side_no: "",
+        ground_no: "",
+        description: "",
+        shower_facility: false,
+        parking_space: false,
+        changing_room: false,
+        restaurant: false,
+        wifi: false,
+        open_ground: false,
+      });
+      setImages(Array(5).fill(null));
+      setErrors({});
+    } catch (error) {
+      console.error("Futsal registration failed:", error);
+      setServerError("❌ Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 overflow-y-auto">
-      <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow p-8 mb-10">
+    <div className="min-h-screen bg-gray-50 py-10">
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-10">
+        <h1 className="text-3xl font-bold text-green-700 mb-10 text-center">
+          🏟️ Register Your Futsal
+        </h1>
 
+        {serverError && (
+          <p className="bg-red-100 text-red-700 p-3 mb-6 rounded">{serverError}</p>
+        )}
 
-        <form onSubmit={handleSubmit} className="space-y-10">
-          {/* SECTION 1: Basic Info */}
-          <section>
-            <h2 className="text-2xl font-semibold text-green-700 mb-4">
-              Basic Information
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Let's start with the essential details about your futsal.
-            </p>
-
-            <div className="space-y-4">
-              <input
-                name="futsalName"
-                value={formData.futsalName}
-                onChange={handleChange}
-                placeholder="Enter futsal name"
-                className="w-full border p-2 rounded-lg"
-              />
-              <input
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="Enter phone number (e.g. 9841234567)"
-                className="w-full border p-2 rounded-lg"
-              />
-              <input
-                name="price"
-                type="number"
-                value={formData.price}
-                onChange={handleChange}
-                placeholder="Enter price per hour (NPR)"
-                className="w-full border p-2 rounded-lg"
-              />
-              <input
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                placeholder="Enter location (e.g. Gyaneshwor, Kathmandu)"
-                className="w-full border p-2 rounded-lg"
-              />
-              <input
-                name="mapLink"
-                value={formData.mapLink}
-                onChange={handleChange}
-                placeholder="Enter Google Maps link (https://goo.gl/maps/...)"
-                className="w-full border p-2 rounded-lg"
-              />
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Basic Info */}
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold text-green-700">Basic Information</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                { name: "name", placeholder: "Futsal Name *" },
+                { name: "phone", placeholder: "Phone Number *" },
+                { name: "price", placeholder: "Price per hour (NPR) *", type: "number" },
+                { name: "location", placeholder: "Location" },
+                { name: "link", placeholder: "Google Maps Link" },
+              ].map((field) => (
+                <div key={field.name}>
+                  <input
+                    name={field.name}
+                    type={field.type || "text"}
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                    placeholder={field.placeholder}
+                    className="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                  {errors[field.name] && (
+                    <p className="text-red-500 text-sm mt-1">{errors[field.name]}</p>
+                  )}
+                </div>
+              ))}
             </div>
           </section>
 
-          {/* SECTION 2: Facilities */}
-          <section>
-            <h2 className="text-2xl font-semibold text-green-700 mb-4">
-              Facilities & Features
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Tell us about the facilities and features of your futsal.
-            </p>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-gray-700 font-medium">A-Side *</label>
-                <input
-                  name="aSide"
-                  type="number"
-                  value={formData.aSide}
-                  onChange={handleChange}
-                  placeholder="Enter number of players per side"
-                  className="w-full border p-2 rounded-lg mt-1"
-                />
-              </div>
-              <div>
-                <label className="text-gray-700 font-medium">
-                  Number of Grounds *
-                </label>
-                <input
-                  name="grounds"
-                  type="number"
-                  value={formData.grounds}
-                  onChange={handleChange}
-                  placeholder="Enter number of grounds"
-                  className="w-full border p-2 rounded-lg mt-1"
-                />
-              </div>
+          {/* Facilities */}
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold text-green-700">Facilities & Features</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input
+                name="side_no"
+                type="number"
+                min={0}
+                value={formData.side_no}
+                onChange={handleChange}
+                placeholder="Players per side"
+                className="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <input
+                name="ground_no"
+                type="number"
+                min={0}
+                value={formData.ground_no}
+                onChange={handleChange}
+                placeholder="Number of Grounds"
+                className="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
             </div>
-
-            <p className="text-gray-500 mt-2 mb-4 text-sm">
-              Number of players per side (e.g., 5 for 5-a-side)
-            </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
               {[
-                "Shower Facility",
-                "Parking Space",
-                "Changing Room",
-                "Restaurant",
-                "WiFi",
-                "Open Ground",
-              ].map((item, i) => (
-                <label key={i} className="flex items-center gap-2">
+                { label: "Shower Facility", name: "shower_facility" },
+                { label: "Parking Space", name: "parking_space" },
+                { label: "Changing Room", name: "changing_room" },
+                { label: "Restaurant", name: "restaurant" },
+                { label: "WiFi", name: "wifi" },
+                { label: "Open Ground", name: "open_ground" },
+              ].map((item) => (
+                <label
+                  key={item.name}
+                  className="flex items-center gap-2 p-2 border rounded-lg hover:bg-green-50 cursor-pointer"
+                >
                   <input
                     type="checkbox"
-                    value={item}
+                    name={item.name}
+                    checked={formData[item.name]}
                     onChange={handleAmenityChange}
-                    checked={formData.amenities.includes(item)}
                   />
-                  <span>{item}</span>
+                  <span>{item.label}</span>
                 </label>
               ))}
             </div>
           </section>
 
-          {/* SECTION 3: Upload Images */}
-          <section>
-            <h2 className="text-2xl font-semibold text-green-700 mb-4">
-              Upload Images
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Upload up to 5 high-quality images of your futsal.
-            </p>
+          {/* Description */}
+          <section className="space-y-2">
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Description"
+              className="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-green-500"
+              rows={4}
+            />
+          </section>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+          {/* Images */}
+          <section className="space-y-2">
+            <h2 className="text-2xl font-semibold text-green-700">Upload Images</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {images.map((img, index) => (
                 <label
                   key={index}
-                  className="border-2 border-dashed rounded-lg flex flex-col items-center justify-center h-40 cursor-pointer hover:bg-gray-50"
+                  className="border-2 border-dashed rounded-lg flex flex-col items-center justify-center h-40 cursor-pointer hover:bg-gray-50 transition relative overflow-hidden"
                 >
                   {img ? (
                     <img
-                      src={img}
+                      src={URL.createObjectURL(img)}
                       alt={`Upload ${index + 1}`}
                       className="h-full w-full object-cover rounded-lg"
                     />
                   ) : (
-                    <div className="flex flex-col items-center text-gray-400">
-                      <span className="text-4xl">🖼️</span>
-                      <span>
-                        {index === 0
-                          ? "Upload Cover Image*"
-                          : `Upload Image ${index + 1}`}
-                      </span>
-                    </div>
+                    <span className="text-gray-400">
+                      Click to upload {index === 0 ? "(Cover*)" : ""}
+                    </span>
                   )}
                   <input
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) =>
-                      handleImageUpload(index, e.target.files[0])
-                    }
+                    onChange={(e) => handleImageUpload(index, e.target.files[0])}
                   />
                 </label>
               ))}
             </div>
-
-            <p className="text-gray-500 text-sm">
-              First image will be used as the cover image. Recommended size:
-              1200×800 pixels.
-            </p>
           </section>
 
           {/* Buttons */}
-          <div className="flex justify-between mt-8">
+          <div className="flex justify-between mt-6">
             <button
               type="button"
-              className="flex items-center gap-1 border px-4 py-2 rounded-lg hover:bg-gray-100"
+              className="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100"
             >
               ← Back
             </button>
             <button
               type="submit"
-              className="flex items-center gap-1 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
+              disabled={loading || Object.values(errors).some(Boolean)}
+              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 disabled:opacity-70"
             >
-              Next →
+              {loading ? "Submitting..." : "Submit →"}
             </button>
           </div>
         </form>

@@ -12,44 +12,18 @@ class Futsal extends Model
     protected $table = 'futsals';
 
     protected $fillable = [
-        'name',
-        'phone',
-        'price',
-        'location',
-        'link',
-        'side_no',
-        'ground_no',
-        'description',
-        'photo',
-        'user_id',
-
-        'shower_facility',
-        'parking_space',
-        'changing_room',
-        'restaurant',
-        'wifi',
-        'open_ground',
+        'name','phone','price','location','link','side_no','ground_no','description','photo','user_id',
+        'shower_facility','parking_space','changing_room','restaurant','wifi','open_ground'
     ];
 
     protected $casts = [
         'photo' => 'array',
         'price' => 'decimal:2',
-
-        'shower_facility' => 'boolean',
-        'parking_space' => 'boolean',
-        'changing_room' => 'boolean',
-        'restaurant' => 'boolean',
-        'wifi' => 'boolean',
-        'open_ground' => 'boolean',
+        'shower_facility'=>'boolean','parking_space'=>'boolean','changing_room'=>'boolean',
+        'restaurant'=>'boolean','wifi'=>'boolean','open_ground'=>'boolean'
     ];
 
-    public function owner()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function bookings()
-    {
-        return $this->hasMany(Booking::class);
+    public function owner() {
+        return $this->belongsTo(User::class,'user_id');
     }
 }
