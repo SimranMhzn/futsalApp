@@ -17,8 +17,6 @@ class Futsal extends Model
     ];
 
     protected $casts = [
-        'photo' => 'array',
-        'price' => 'decimal:2',
         'shower_facility'=>'boolean','parking_space'=>'boolean','changing_room'=>'boolean',
         'restaurant'=>'boolean','wifi'=>'boolean','open_ground'=>'boolean'
     ];

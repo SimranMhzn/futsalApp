@@ -30,7 +30,7 @@ class FutsalController extends Controller
             'side_no' => 'nullable|integer',
             'ground_no' => 'nullable|integer',
             'description' => 'nullable|string',
-            'photo.*' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $futsal = new Futsal($validated);
