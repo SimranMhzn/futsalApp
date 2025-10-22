@@ -4,55 +4,106 @@ namespace App\Http\Controllers;
 
 use App\Models\Futsal;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class FutsalController extends Controller
 {
-    // Return all futsals of the logged-in user
+    // ✅ Show all futsals
     public function index()
     {
-        $futsals = Futsal::where('user_id', Auth::id())
-            ->orderByDesc('created_at')
-            ->get();
-
-        return response()->json($futsals);
+        $futsals = Futsal::all();
+        return view('futsals.index', compact('futsals'));
     }
 
-    // Example store method for futsal registration
+    // ✅ Show form to create a new futsal
+    public function create()
+    {
+        return view('futsals.create');
+    }
+
+    // ✅ Store new futsal
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'price' => 'nullable|numeric',
-            'location' => 'nullable|string|max:255',
-            'link' => 'nullable|url',
-            'side_no' => 'nullable|integer',
-            'ground_no' => 'nullable|integer',
-            'description' => 'nullable|string',
-            'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        $request->validate([
+    'name' => 'required|string|max:255',
+    'phone' => 'required|string|max:20',
+    'email' => 'required|email|max:255',
+    'price' => 'required|numeric',
+    'photo' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+]);
+
+        // 2️⃣ Upload the photo
+        $photoUrl = null;
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('futsal_photos', 'public');
+            $photoUrl = asset('storage/' . $path);
+        }
+
+        // 3️⃣ Save to database
+        Futsal::create([
+            'name'            => $request->name,
+            'phone'           => $request->phone,
+            'email'           => $request->email, 
+            'price'           => $request->price,
+            'location'        => $request->location,
+            'link'            => $request->link,
+            'side_no'         => $request->side_no,
+            'ground_no'       => $request->ground_no,
+            'description'     => $request->description,
+            'photo'           => $photoUrl,
+            'shower_facility' => $request->boolean('shower_facility'),
+            'parking_space'   => $request->boolean('parking_space'),
+            'changing_room'   => $request->boolean('changing_room'),
+            'restaurant'      => $request->boolean('restaurant'),
+            'wifi'            => $request->boolean('wifi'),
+            'open_ground'     => $request->boolean('open_ground'),
         ]);
 
-        $futsal = new Futsal($validated);
-        $futsal->user_id = Auth::id();
+        return redirect()->route('futsals.index')->with('success', 'Futsal registered successfully!');
+    }
 
-        // Amenities
-        $amenities = ['shower_facility','parking_space','changing_room','restaurant','wifi','open_ground'];
-        foreach ($amenities as $amenity) {
-            $futsal->$amenity = $request->has($amenity);
-        }
+    // ✅ Show one futsal detail
+    public function show($id)
+    {
+        $futsal = Futsal::findOrFail($id);
+        return view('futsals.show', compact('futsal'));
+    }
 
+    // ✅ Show form to edit futsal
+    public function edit($id)
+    {
+        $futsal = Futsal::findOrFail($id);
+        return view('futsals.edit', compact('futsal'));
+    }
+
+    // ✅ Update futsal info
+    public function update(Request $request, $id)
+    {
+        $futsal = Futsal::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'price' => 'required|numeric',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        // Handle new photo if uploaded
         if ($request->hasFile('photo')) {
-            $photos = [];
-            foreach ($request->file('photo') as $file) {
-                $path = $file->store('futsal_photos', 'public');
-                $photos[] = asset('storage/' . $path);
-            }
-            $futsal->photo = $photos;
+            $path = $request->file('photo')->store('futsal_photos', 'public');
+            $futsal->photo = asset('storage/' . $path);
         }
 
-        $futsal->save();
+        $futsal->update($request->except('photo'));
 
-        return response()->json(['message' => 'Futsal registered successfully', 'futsal' => $futsal], 201);
+        return redirect()->route('futsals.index')->with('success', 'Futsal updated successfully!');
+    }
+
+    // ✅ Delete futsal
+    public function destroy($id)
+    {
+        $futsal = Futsal::findOrFail($id);
+        $futsal->delete();
+
+        return redirect()->route('futsals.index')->with('success', 'Futsal deleted successfully!');
     }
 }

@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->integer('side_no')->nullable();
             $table->integer('ground_no')->nullable();
             $table->text('description')->nullable();
-            $table->json('photo')->nullable();
+            $table->string('photo')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
 
             // Amenities
