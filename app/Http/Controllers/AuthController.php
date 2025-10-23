@@ -3,18 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Futsal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function showRegistrationForm()
+    public function showUserRegistrationForm()
     {
-        return view('auth.register');
+        return view('auth.register_user');
     }
 
-    public function register(Request $request)
+
+    public function showFutsalRegistrationForm()
+    {
+        return view('auth.register_futsal');
+    }
+
+    public function registerUser(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -47,59 +54,91 @@ class AuthController extends Controller
             'role' => $request->role ?? 'user',
             'password' => Hash::make($request->password),
         ]);
+        Auth::login($user);
+        return redirect()->route('user.home')->with('success', 'Account created successfully!');
+    }
+
+    public function registerFutsal(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users|regex:/^[A-Za-z0-9._%+-]+@gmail\.com$/i',
+            'phone' => 'required|digits:10',
+            'password' => 'required|string|min:8|confirmed|regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
+        ], [
+            'email.regex' => 'Email must be a valid Gmail address.',
+            'phone.digits' => 'Phone number must be exactly 10 digits.',
+            'password.regex' => 'Password must contain at least one uppercase, one lowercase, one number, and one special character.',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'role' => $request->role ?? 'futsal',
+            'password' => Hash::make($request->password),
+        ]);
 
         Auth::login($user);
 
-        return redirect()->route('futsals.index');
+        return redirect()->route('futsal.home');
     }
 
-    public function showLoginForm()
+    public function showUserLoginForm()
     {
-        return view('auth.login');
+        return view('auth.login_user');
     }
 
-    public function login(Request $request)
+    public function loginUser(Request $request)
     {
         $request->validate([
-            'email' => 'required|string|email',
+            'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
-        $email = $request->email;
-        $password = $request->password;
-
-        // Check Users table
-        $user = \App\Models\User::where('email', $email)->first();
-        if ($user && \Hash::check($password, $user->password)) {
+        $user = User::where('email', $request->email)->first();
+        if ($user && Hash::check($request->password, $user->password)) {
             Auth::login($user);
             $request->session()->regenerate();
-            return redirect()->route('user.home'); // Redirect regular user
+
+            return redirect()->route('user.home');
         }
 
-        // Check Futsals table
-        $futsal = \App\Models\Futsal::where('email', $email)->first();
-        if ($futsal && \Hash::check($password, $futsal->password)) {
-            Auth::login($futsal);
-            $request->session()->regenerate();
-            return redirect()->route('futsal.home'); // Redirect futsal owner
-        }
-
-        return back()->withErrors([
-            'email' => 'Invalid credentials'
-        ])->onlyInput('email');
+        return back()->withErrors(['email' => 'Invalid email or password'])->withInput();
     }
 
+    public function showFutsalLoginForm()
+    {
+        return view('auth.login_futsal');
+    }
+
+    public function loginFutsal(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::guard('futsal')->attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended(route('futsal.home'));
+        }
+
+        return back()->withErrors(['email' => 'Invalid email or password'])->withInput();
+    }
 
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('login.form');
+        return redirect()->route('home');
     }
 
     public function profile()
     {
-        return view('profile'); // resources/views/profile.blade.php
+        return view('profile');
     }
 }

@@ -13,7 +13,8 @@ class Booking extends Model
         'futsal_id',
         'user_id',
         'date',
-        'time',
+        'start_time',
+        'end_time',
         'status',
     ];
 
@@ -27,4 +28,3 @@ class Booking extends Model
         return $this->belongsTo(User::class);
     }
 }
-

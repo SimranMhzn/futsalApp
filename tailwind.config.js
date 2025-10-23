@@ -1,13 +1,17 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/**/*.{js,jsx,ts,tsx}",  // your React components
-    "./node_modules/flowbite-react/**/*.js" // <-- Flowbite components
+    "./resources/**/*.blade.php",  // Include Laravel Blade templates
+    "./resources/**/*.js",
+    "./resources/**/*.ts",
+    "./resources/**/*.jsx",
+    "./resources/**/*.tsx",
+    "./node_modules/flowbite-react/**/*.js", // Flowbite
   ],
   theme: {
     extend: {},
   },
   plugins: [
-    require('flowbite/plugin')
+    require('flowbite/plugin'),
   ],
 }
