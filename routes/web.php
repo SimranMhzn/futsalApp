@@ -72,9 +72,10 @@ Route::middleware(['auth'])->group(function () {
 // Profile
 // ===========================
 Route::middleware(['auth'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::post('/profile/validate-password', [ProfileController::class, 'validatePassword'])->name('profile.validate-password');
 });
 
 // ===========================
@@ -104,5 +105,4 @@ Route::middleware(['auth', 'admin'])
     Route::post('futsals/{id}/reject', [FutsalController::class, 'rejectFutsal'])
         ->name('futsals.reject');
     });
-
 

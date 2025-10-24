@@ -73,4 +73,10 @@ class BookingController extends Controller
         return redirect()->route('booking.history')->with('success', 'Booking deleted successfully!');
     }
 
+    public function history()
+    {
+        $bookings = auth()->user()->bookings()->latest()->get();
+        return view('booking.history', compact('bookings'));
+    }
+
 }

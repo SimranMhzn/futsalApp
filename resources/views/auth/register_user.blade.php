@@ -4,7 +4,7 @@
 <div class="max-w-md mx-auto bg-white p-10 rounded-2xl shadow-lg mt-10" x-data="registerForm()">
     <h2 class="text-3xl font-bold mb-6 text-center text-green-700">Register as User</h2>
 
-    <form x-ref="form" method="POST" action="{{ route('register.user') }}" @submit.prevent="submitForm">
+    <form x-ref="form" method="POST" action="{{ route('register.user.form') }}" @submit.prevent="submitForm">
         @csrf
 
         <!-- Name -->
