@@ -13,7 +13,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('login.user') }}" class="space-y-5">
+        <form method="POST" action="{{ route('login.user.form') }}" class="space-y-5">
             @csrf
             <input 
                 type="email" 

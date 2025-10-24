@@ -10,27 +10,29 @@ use Illuminate\Support\Facades\Hash;
 class FutsalController extends Controller
 {
     public function index(Request $request)
-{
-    $query = Futsal::query();
+    {
+        $query = Futsal::where('status', 'approved');
 
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where('name', 'like', "%$search%")
-              ->orWhere('location', 'like', "%$search%");
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('location', 'like', "%$search%");
+            });
+        }
+
+        $futsals = $query->get()->map(function ($futsal) {
+            $futsal->photo = $futsal->photo ? asset('storage/' . $futsal->photo) : null;
+            return $futsal;
+        });
+
+        if ($request->ajax()) {
+            return view('futsal.partials.list', compact('futsals'));
+        }
+
+        return view('futsal.index', compact('futsals'));
     }
 
-    $futsals = $query->get()->map(function ($futsal) {
-        $futsal->photo = $futsal->photo ? asset('storage/' . $futsal->photo) : null;
-        return $futsal;
-    });
-
-    // Return partial for AJAX request
-    if ($request->ajax()) {
-        return view('futsal.partials.list', compact('futsals'));
-    }
-
-    return view('futsal.index', compact('futsals'));
-}
 
 
     public function create()
@@ -57,6 +59,7 @@ class FutsalController extends Controller
         $data = $request->all();
         $data['user_id'] = Auth::id();
         $data['role'] = 'futsal';
+        $data['status'] = 'pending';
 
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('futsal_photos', 'public');
@@ -129,4 +132,36 @@ class FutsalController extends Controller
 
         return redirect()->route('futsal.index')->with('success', 'Futsal deleted successfully!');
     }
+    public function pendingFutsals()
+    {
+        $futsals = Futsal::where('status', 'pending')->get();
+        return view('admin.futsals.pending', compact('futsals'));
+    }
+
+    public function approveFutsal($id)
+    {
+        $futsal = Futsal::findOrFail($id);
+        $futsal->update(['status' => 'approved']);
+
+        return back()->with('success', 'Futsal approved successfully.');
+    }
+
+    public function rejectFutsal($id)
+    {
+        $futsal = Futsal::findOrFail($id);
+        $futsal->update(['status' => 'rejected']);
+
+        return back()->with('error', 'Futsal rejected.');
+    }
+
+    /**
+     * Show the logged-in futsal their registration status
+     */
+    public function myFutsalStatus()
+    {
+        $futsal = auth()->guard('futsal')->user(); // get the currently logged-in futsal
+        return view('futsal.my-status', compact('futsal'));
+    }
+
+
 }

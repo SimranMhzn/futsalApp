@@ -12,7 +12,7 @@
             <p class="bg-green-100 text-green-700 p-3 mb-6 rounded">{{ session('success') }}</p>
         @endif
 
-        <form action="{{ route('futsal.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('register.futsal.form') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <!-- Basic Info -->

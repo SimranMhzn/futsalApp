@@ -8,7 +8,7 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
     <!-- Manage Blogs Card -->
-    <a href="{{ route('blogs.index') }}" class="bg-white rounded-2xl shadow p-6 hover:shadow-lg transition">
+    <a href="{{ route('blog.index') }}" class="bg-white rounded-2xl shadow p-6 hover:shadow-lg transition">
         <h2 class="text-xl font-bold mb-2">Manage Blogs</h2>
         <p class="text-gray-600">Create, edit, and delete blog posts.</p>
     </a>

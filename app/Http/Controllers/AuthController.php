@@ -65,23 +65,36 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users|regex:/^[A-Za-z0-9._%+-]+@gmail\.com$/i',
             'phone' => 'required|digits:10',
             'password' => 'required|string|min:8|confirmed|regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
+            'price' => 'required|numeric',
+
         ], [
             'email.regex' => 'Email must be a valid Gmail address.',
             'phone.digits' => 'Phone number must be exactly 10 digits.',
             'password.regex' => 'Password must contain at least one uppercase, one lowercase, one number, and one special character.',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'role' => $request->role ?? 'futsal',
-            'password' => Hash::make($request->password),
-        ]);
+        $data = $request->all();
 
-        Auth::login($user);
+        $data['user_id'] = Auth::id();
+        $data['status'] = 'pending';
 
-        return redirect()->route('futsal.home');
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('futsal_photos', 'public');
+        }
+
+        $checkboxes = ['shower_facility', 'parking_space', 'changing_room', 'restaurant', 'wifi', 'open_ground'];
+        foreach ($checkboxes as $cb) {
+            $data[$cb] = $request->has($cb) ? 1 : 0;
+        }
+
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
+
+        Futsal::create($data);
+
+        return redirect()->route('user.home')
+            ->with('success', 'Registration submitted! Wait for admin approval.');
     }
 
     public function showUserLoginForm()
