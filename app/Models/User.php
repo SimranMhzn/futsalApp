@@ -18,7 +18,7 @@ class User extends Authenticatable
         'name',
         'email',
         'phone',
-        'role',      // 'user' or 'futsal'
+        'role',      
         'password',
     ];
 

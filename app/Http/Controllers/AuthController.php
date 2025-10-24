@@ -97,15 +97,20 @@ class AuthController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
+
         if ($user && Hash::check($request->password, $user->password)) {
             Auth::login($user);
             $request->session()->regenerate();
-
-            return redirect()->route('user.home');
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } else {
+                return redirect()->route('user.home');
+            }
         }
 
         return back()->withErrors(['email' => 'Invalid email or password'])->withInput();
     }
+
 
     public function showFutsalLoginForm()
     {
@@ -127,6 +132,30 @@ class AuthController extends Controller
         }
 
         return back()->withErrors(['email' => 'Invalid email or password'])->withInput();
+    }
+
+    // Show admin login form
+    public function showAdminLoginForm()
+    {
+        return view('auth.login_admin');
+    }
+
+    public function loginAdmin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)->where('role', 'admin')->first();
+
+        if ($user && Hash::check($request->password, $user->password)) {
+            Auth::login($user);
+            $request->session()->regenerate();
+            return redirect()->route('admin.dashboard')->with('success', 'Welcome, Admin!');
+        }
+
+        return back()->withErrors(['email' => 'Invalid credentials or not an admin.'])->withInput();
     }
 
     public function logout(Request $request)
