@@ -58,7 +58,6 @@ npm install && npm run dev
 cp .env.example .env
 php artisan key:generate
 Then configure your database credentials inside .env:
-
 env
 DB_DATABASE=futsal_db
 DB_USERNAME=root
