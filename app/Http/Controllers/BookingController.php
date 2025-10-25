@@ -79,4 +79,27 @@ class BookingController extends Controller
         return view('booking.history', compact('bookings'));
     }
 
+    public function update(Request $request, $id)
+    {
+        // Validate input
+        $request->validate([
+            'date' => 'required|date|after_or_equal:today',
+            'start_time' => 'required|integer|min:0|max:23',
+            'end_time' => 'required|integer|gt:start_time',
+        ]);
+
+        // Find booking and ensure it belongs to the authenticated user
+        $booking = Booking::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        // Update booking
+        $booking->update([
+            'date' => $request->date,
+            'start_time' => sprintf('%02d:00:00', $request->start_time),
+            'end_time' => sprintf('%02d:00:00', $request->end_time),
+        ]);
+
+        return redirect()->route('booking.history')->with('success', 'Booking updated successfully!');
+    }
 }
