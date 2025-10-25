@@ -121,7 +121,6 @@
                         <template x-if="new_password_error">
                             <p class="text-red-600 text-sm mt-1" x-text="new_password_error"></p>
                         </template>
-                        <p class="text-gray-400 text-sm mt-1">Password must be at least 8 characters.</p>
                     </div>
 
                     {{-- Confirm New Password --}}

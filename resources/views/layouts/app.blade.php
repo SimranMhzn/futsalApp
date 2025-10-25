@@ -29,18 +29,21 @@
                 <li><a href="{{ route('blog.index') }}" class="hover:text-yellow-300">Blog</a></li>
             @else
                 @php
-                    $role = auth()->user()->role ?? 'user';
+                    (auth()->guard('futsal')->check()) ? 
+                        $role = 'futsal' :
+                        $role = auth()->user()->role ?? 'user';
                 @endphp
 
                 @if ($role === 'admin')
                     <!-- Admin Links -->
-                    <li><a href="{{ route('blog.index') }}" class="hover:text-yellow-300">Manage Blogs</a></li>
-                    <li><a href="{{ route('futsal.index') }}" class="hover:text-yellow-300">Manage Futsals</a></li>
-                    <li><a href="{{ route('admin.futsals.pending') }}" class="hover:text-yellow-300">Pending Futsals</a></li> 
+                    <li><a href="{{ route('admin.blogs.index') }}" class="hover:text-yellow-300">Blogs</a></li>
+                    <li><a href="{{ route('futsal.index') }}" class="hover:text-yellow-300">Futsals</a></li>
+                    <li><a href="{{ route('admin.futsals.pending') }}" class="hover:text-yellow-300">Futsals Request</a>
+                    </li>
                     <li><a href="{{ url('/profile') }}" class="hover:text-yellow-300">Profile</a></li>
                 @elseif($role === 'user')
                     <!-- Normal User Links -->
-                    <li><a href="{{ url('/') }}" class="hover:text-yellow-300">Home</a></li>
+                    <li><a href="{{ route('user.home') }}" class="hover:text-yellow-300">Home</a></li>
                     <li><a href="{{ route('futsal.index') }}" class="hover:text-yellow-300">Find Futsal</a></li>
                     <li><a href="{{ route('blog.index') }}" class="hover:text-yellow-300">Blog</a></li>
                     <li><a href="{{ url('/profile') }}" class="hover:text-yellow-300">Profile</a></li>

@@ -1,9 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="bg-green-700 text-white py-16 text-center rounded-b-3xl shadow-lg">
-    <h1 class="text-4xl font-bold">Futsal Blogs</h1>
-    <p class="mt-2 text-lg">Discover insights about the best futsal facilities and tips</p>
+<section class="flex flex-col bg-emerald-800 text-white text-center md:text-left">
+    <div class="bg-emerald-800 text-white px-14 py-24 items-center">
+    <h1 class="mb-4 text-3xl font-bold md:text-5xl">Futsal Blogs</h1>
+    <p class="mb-8 text-lg md:text-xl">Discover insights about the best futsal facilities and tips</p>
+    {{-- Add Create Blog Button --}}
+    @auth('futsal')
+        <div class="mt-6">
+            <a href="{{ route('futsal.blogs.create') }}" class="bg-white text-green-700 font-semibold px-6 py-3 rounded-xl shadow hover:bg-gray-100 transition">
+                Create Blog
+            </a>
+        </div>
+    @endauth
+    </div>
 </section>
 
 <div class="max-w-6xl mx-auto py-10 px-6">
@@ -23,9 +33,6 @@
                 </p>
                 <p class="text-gray-700 mb-4">{{ Str::limit($blog->content, 150) }}</p>
 
-                <a href="{{ route('blogs.show', $blog->id) }}" class="text-green-600 font-semibold hover:underline">
-                    Read Full Blog →
-                </a>
             </div>
         @endforeach
     </div>

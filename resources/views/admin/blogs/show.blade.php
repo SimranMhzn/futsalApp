@@ -5,10 +5,10 @@
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold">{{ $blog->title }}</h1>
         <div class="flex gap-2">
-            <a href="{{ route('blogs.edit', $blog->id) }}" class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">
+            <a href="{{ route('blog.edit', $blog->id) }}" class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">
                 Edit
             </a>
-            <form action="{{ route('blogs.destroy', $blog->id) }}" method="POST" onsubmit="return confirm('Delete this blog?');">
+            <form action="{{ route('blog.destroy', $blog->id) }}" method="POST" onsubmit="return confirm('Delete this blog?');">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700">

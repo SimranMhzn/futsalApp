@@ -9,7 +9,7 @@
 
     <p class="text-gray-700 leading-relaxed">{{ $blog->content }}</p>
 
-    <a href="{{ route('blogs.index') }}" class="inline-block mt-6 text-green-600 font-semibold hover:underline">
+    <a href="{{ route('blog.index') }}" class="inline-block mt-6 text-green-600 font-semibold hover:underline">
         ← Back to Blogs
     </a>
 </div>

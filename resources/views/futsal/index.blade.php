@@ -3,7 +3,6 @@
 @section('content')
 <section class="relative">
 
-    <!-- Header -->
     <div class="bg-emerald-800 text-white px-14 py-24 items-center">
         <h1 class="mb-4 text-3xl font-bold md:text-5xl">Find Futsals</h1>
         <p class="mb-8 text-lg md:text-xl">Discover and book the best futsal courts in your area</p>
