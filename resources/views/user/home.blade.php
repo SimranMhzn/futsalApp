@@ -3,7 +3,6 @@
 @section('title', 'Home')
 
 @section('content')
-<!-- Hero Section -->
 <section class="flex flex-col md:flex-row items-center bg-emerald-800 px-8 md:px-14 py-24 text-white text-center md:text-left gap-8">
     <div class="md:w-1/2">
         <h1 class="mb-4 text-3xl font-bold md:text-5xl">Book Your Perfect Futsal Court in Seconds</h1>
@@ -51,8 +50,8 @@
 
 
 <!-- How It Works Section -->
-<section class="bg-gray-50 px-6 py-20">
-    <h2 class="mb-16 text-center text-4xl font-semibold text-gray-900">How It Works</h2>
+<section class="bg-gree-900 px-6 py-20">
+    <h2 class="mb-16 text-center text-4xl font-semibold text-white">How It Works</h2>
     <div class="mx-auto grid max-w-6xl grid-cols-1 gap-10 md:grid-cols-3">
         @foreach ([
             ['1', 'Find a Futsal Court', 'Browse futsal courts and filter by location, price, or facilities.'],

@@ -51,8 +51,8 @@
 
 
 <!-- How It Works Section -->
-<section class="bg-gray-50 px-6 py-20">
-    <h2 class="mb-16 text-center text-4xl font-semibold text-gray-900">How It Works</h2>
+<section class="bg-green-900 px-6 py-20">
+    <h2 class="mb-16 text-center text-4xl font-semibold text-white">How It Works</h2>
     <div class="mx-auto grid max-w-6xl grid-cols-1 gap-10 md:grid-cols-3">
         @foreach ([
             ['1', 'Find a Futsal Court', 'Browse futsal courts and filter by location, price, or facilities.'],

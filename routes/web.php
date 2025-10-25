@@ -6,6 +6,7 @@ use App\Http\Controllers\FutsalController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
 
 Route::get('/', function () {
     return view('home');
@@ -25,7 +26,7 @@ Route::post('/register/futsal', [AuthController::class, 'registerFutsal']);
 // ===========================
 // Login
 // ===========================
-Route::get('/login', fn() => redirect()->route('login.user.form'))->name('login'); 
+Route::get('/login', fn() => redirect()->route('login.user.form'))->name('login');
 Route::get('/login/user', [AuthController::class, 'showUserLoginForm'])->name('login.user.form');
 Route::post('/login/user', [AuthController::class, 'loginUser']);
 
@@ -45,6 +46,7 @@ Route::prefix('futsal')->group(function () {
     Route::get('/{id}', [FutsalController::class, 'show'])->name('futsal.show');
 
     Route::middleware(['auth:futsal'])->group(function () {
+        Route::get('/home', [FutsalController::class, 'dashboard'])->name('futsal.home');
         Route::get('/create', [FutsalController::class, 'create'])->name('futsal.create');
         Route::post('/', [FutsalController::class, 'store'])->name('futsal.store');
         Route::get('/{futsal}/edit', [FutsalController::class, 'edit'])->name('futsal.edit');
@@ -52,6 +54,8 @@ Route::prefix('futsal')->group(function () {
         Route::delete('/{futsal}', [FutsalController::class, 'destroy'])->name('futsal.destroy');
         Route::get('/profile', [AuthController::class, 'profile'])->name('futsal.profile');
         Route::get('/futsal/my-status', [FutsalController::class, 'myFutsalStatus'])->name('futsal.my-status');
+        Route::get('/blogs/create', [BlogController::class, 'create'])->name('futsal.blogs.create');
+        Route::post('/blogs', [BlogController::class, 'store'])->name('futsal.blogs.store');
     });
 });
 
@@ -73,36 +77,37 @@ Route::middleware(['auth'])->group(function () {
 // ===========================
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::post('/profile/validate-password', [ProfileController::class, 'validatePassword'])->name('profile.validate-password');
 });
 
 // ===========================
-// Blogs
+// Blogs (Public)
 // ===========================
 Route::get('/blogs', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blogs/{id}', [BlogController::class, 'show'])->name('blog.show');
 
+// ===========================
+// Blogs (Admin)
+// ===========================
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
-        Route::get('/blogs/create', [BlogController::class, 'create'])->name('blog.create');
-        Route::post('/blogs', [BlogController::class, 'store'])->name('blog.store');
-        Route::get('/blogs/{blog}/edit', [BlogController::class, 'edit'])->name('blog.edit');
-        Route::put('/blogs/{blog}', [BlogController::class, 'update'])->name('blog.update');
-        Route::delete('/blogs/{blog}', [BlogController::class, 'destroy'])->name('blog.destroy');
-        Route::get('/futsals/pending', [FutsalController::class, 'pendingFutsals'])
-        ->name('futsals.pending');
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    // Approve a futsal
-    Route::post('futsals/{id}/approve', [FutsalController::class, 'approveFutsal'])
-        ->name('futsals.approve');
+        // Admin blog routes
+        Route::get('/blogs', [BlogController::class, 'adminIndex'])->name('blogs.index');
+        Route::get('/blogs/create', [BlogController::class, 'create'])->name('blogs.create');
+        Route::post('/blogs', [BlogController::class, 'store'])->name('blogs.store');
+        Route::get('/blogs/{blog}/edit', [BlogController::class, 'edit'])->name('blogs.edit');
+        Route::put('/blogs/{blog}', [BlogController::class, 'update'])->name('blogs.update');
+        Route::delete('/blogs/{blog}', [BlogController::class, 'destroy'])->name('blogs.destroy');
 
-    // Reject a futsal
-    Route::post('futsals/{id}/reject', [FutsalController::class, 'rejectFutsal'])
-        ->name('futsals.reject');
+        // Admin futsal routes
+        Route::get('/futsals/pending', [FutsalController::class, 'pendingFutsals'])->name('futsals.pending');
+        Route::post('/futsals/{id}/approve', [FutsalController::class, 'approveFutsal'])->name('futsals.approve');
+        Route::post('/futsals/{id}/reject', [FutsalController::class, 'rejectFutsal'])->name('futsals.reject');
     });
 

@@ -33,6 +33,11 @@ class FutsalController extends Controller
         return view('futsal.index', compact('futsals'));
     }
 
+    public function dashboard()
+    {
+        $futsal = auth()->guard('futsal')->user();
+        return view('futsal.dashboard', compact('futsal'));
+    }
 
 
     public function create()
