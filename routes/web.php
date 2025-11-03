@@ -41,6 +41,7 @@ Route::post('/login/admin', [AuthController::class, 'loginAdmin']);
 // ===========================
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+
 Route::prefix('futsal')->group(function () {
     Route::get('/', [FutsalController::class, 'index'])->name('futsal.index');
 

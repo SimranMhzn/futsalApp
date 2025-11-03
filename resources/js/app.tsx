@@ -1,4 +1,5 @@
 import ReactDOM from 'react-dom/client';
+import 'flowbite';
 
 function ReactApp() {
     return (
