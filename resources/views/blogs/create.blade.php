@@ -4,7 +4,7 @@
 <div class="max-w-3xl mx-auto py-10">
     <h1 class="text-3xl font-bold mb-6">Create Blog</h1>
 
-    <form action="{{ route('futsal.blogs.store') }}" method="POST">
+    <form action="{{ route('admin.blogs.store') }}" method="POST">
         @csrf
         <div class="mb-4">
             <label class="block mb-2">Title</label>
