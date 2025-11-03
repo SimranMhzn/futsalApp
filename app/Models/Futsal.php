@@ -34,6 +34,8 @@ class Futsal extends Authenticatable
         'role',
         'password',
         'status',
+        'open_time',
+        'close_time'
     ];
 
     protected $hidden = [

@@ -46,43 +46,102 @@ class FutsalController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'email' => 'required|email',
-            'price' => 'required|numeric',
-            'photo' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'password' => 'nullable|string|min:6|confirmed',
-            'side_no' => 'nullable|numeric',
-            'ground_no' => 'nullable|numeric',
-            'location' => 'nullable|string|max:255',
-            'link' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-        ]);
+{
+    // Validation
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'phone' => 'required|string|max:20',
+        'email' => 'required|email',
+        'price' => 'required|numeric',
+        'photo' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+        'password' => 'nullable|string|min:6|confirmed',
+        'side_no' => 'nullable|numeric',
+        'ground_no' => 'nullable|numeric',
+        'location' => 'nullable|string|max:255',
+        'link' => 'nullable|string|max:255',
+        'description' => 'nullable|string',
+        'open_hour' => 'required|integer|between:0,23',
+        'open_minute' => 'required|integer|between:0,59',
+        'close_hour' => 'required|integer|between:0,23',
+        'close_minute' => 'required|integer|between:0,59',
+    ]);
 
-        $data = $request->all();
-        $data['user_id'] = Auth::id();
-        $data['role'] = 'futsal';
-        $data['status'] = 'pending';
+    // Prepare data
+    $data = $request->except('photo', 'open_hour', 'open_minute', 'close_hour', 'close_minute');
+    $data['user_id'] = Auth::id();
+    $data['role'] = 'futsal';
+    $data['status'] = 'pending';
 
-        if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('futsal_photos', 'public');
-        }
+    // Combine hour and minute into HH:MM
+    $data['open_time'] = sprintf('%02d:%02d', $request->open_hour, $request->open_minute);
+    $data['close_time'] = sprintf('%02d:%02d', $request->close_hour, $request->close_minute);
 
-        $checkboxes = ['shower_facility', 'parking_space', 'changing_room', 'restaurant', 'wifi', 'open_ground'];
-        foreach ($checkboxes as $cb) {
-            $data[$cb] = $request->has($cb) ? 1 : 0;
-        }
-
-        if (!empty($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        }
-
-        Futsal::create($data);
-
-        return redirect()->route('futsal.index')->with('success', 'Futsal registered successfully!');
+    // Handle photo
+    if ($request->hasFile('photo')) {
+        $data['photo'] = $request->file('photo')->store('futsal_photos', 'public');
     }
+
+    // Handle checkboxes
+    $checkboxes = ['shower_facility', 'parking_space', 'changing_room', 'restaurant', 'wifi', 'open_ground'];
+    foreach ($checkboxes as $cb) {
+        $data[$cb] = $request->has($cb) ? 1 : 0;
+    }
+
+    // Handle password
+    if (!empty($data['password'])) {
+        $data['password'] = Hash::make($data['password']);
+    }
+
+    Futsal::create($data);
+
+    return redirect()->route('futsal.index')->with('success', 'Futsal registered successfully!');
+}
+
+
+public function update(Request $request, $id)
+{
+    $futsal = Futsal::findOrFail($id);
+
+    // Validation
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'phone' => 'required|string|max:20',
+        'price' => 'required|numeric',
+        'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        'password' => 'nullable|string|min:6|confirmed',
+        'open_hour' => 'required|integer|between:0,23',
+        'open_minute' => 'required|integer|between:0,59',
+        'close_hour' => 'required|integer|between:0,23',
+        'close_minute' => 'required|integer|between:0,59',
+    ]);
+
+    $data = $request->except('photo', 'password', 'open_hour', 'open_minute', 'close_hour', 'close_minute');
+
+    // Combine hour and minute into HH:MM
+    $data['open_time'] = sprintf('%02d:%02d', $request->open_hour, $request->open_minute);
+    $data['close_time'] = sprintf('%02d:%02d', $request->close_hour, $request->close_minute);
+
+    // Handle photo
+    if ($request->hasFile('photo')) {
+        $futsal->photo = $request->file('photo')->store('futsal_photos', 'public');
+    }
+
+    // Handle checkboxes
+    $checkboxes = ['shower_facility', 'parking_space', 'changing_room', 'restaurant', 'wifi', 'open_ground'];
+    foreach ($checkboxes as $cb) {
+        $data[$cb] = $request->has($cb) ? 1 : 0;
+    }
+
+    // Handle password
+    if (!empty($request->password)) {
+        $data['password'] = Hash::make($request->password);
+    }
+
+    $futsal->update($data);
+
+    return redirect()->route('futsal.index')->with('success', 'Futsal updated successfully!');
+}
+
 
     public function show($id)
     {
@@ -94,40 +153,6 @@ class FutsalController extends Controller
     {
         $futsal = Futsal::findOrFail($id);
         return view('futsal.edit', compact('futsal'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $futsal = Futsal::findOrFail($id);
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'price' => 'required|numeric',
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'password' => 'nullable|string|min:6|confirmed',
-        ]);
-
-        if ($request->hasFile('photo')) {
-            $futsal->photo = $request->file('photo')->store('futsal_photos', 'public');
-        }
-
-        $data = $request->except('photo');
-
-        if (!empty($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        } else {
-            unset($data['password']);
-        }
-
-        $checkboxes = ['shower_facility', 'parking_space', 'changing_room', 'restaurant', 'wifi', 'open_ground'];
-        foreach ($checkboxes as $cb) {
-            $data[$cb] = $request->has($cb) ? 1 : 0;
-        }
-
-        $futsal->update($data);
-
-        return redirect()->route('futsal.index')->with('success', 'Futsal updated successfully!');
     }
 
     public function destroy($id)
@@ -157,15 +182,6 @@ class FutsalController extends Controller
         $futsal->update(['status' => 'rejected']);
 
         return back()->with('error', 'Futsal rejected.');
-    }
-
-    /**
-     * Show the logged-in futsal their registration status
-     */
-    public function myFutsalStatus()
-    {
-        $futsal = auth()->guard('futsal')->user(); // get the currently logged-in futsal
-        return view('futsal.my-status', compact('futsal'));
     }
 
 

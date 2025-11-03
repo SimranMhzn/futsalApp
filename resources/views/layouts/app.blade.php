@@ -38,8 +38,7 @@
                     <!-- Admin Links -->
                     <li><a href="{{ route('admin.blogs.index') }}" class="hover:text-yellow-300">Blogs</a></li>
                     <li><a href="{{ route('futsal.index') }}" class="hover:text-yellow-300">Futsals</a></li>
-                    <li><a href="{{ route('admin.futsals.pending') }}" class="hover:text-yellow-300">Futsals Request</a>
-                    </li>
+                    <li><a href="{{ route('admin.futsals.pending') }}" class="hover:text-yellow-300">Futsals Request</a></li>
                     <li><a href="{{ url('/profile') }}" class="hover:text-yellow-300">Profile</a></li>
                 @elseif($role === 'user')
                     <!-- Normal User Links -->
@@ -51,8 +50,8 @@
                 @elseif($role === 'futsal')
                     <!-- Futsal Links -->
                     <li><a href="{{ route('futsal.home') }}" class="hover:text-yellow-300">Dashboard</a></li>
-                    <li><a href="{{ route('futsal.create') }}" class="hover:text-yellow-300">Add Futsal</a></li>
-                    <li><a href="{{ route('futsal.index') }}" class="hover:text-yellow-300">My Futsals</a></li>
+                    <li><a href="{{ route('futsal.profile') }}" class="hover:text-yellow-300">Profile</a></li>
+
                 @endif
             @endguest
 
