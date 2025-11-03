@@ -60,35 +60,35 @@ class BlogController extends Controller
 
     public function store(Request $request)
     {
-        $user = Auth::user();
-        $guard = Auth::guard('futsal')->user(); // check if futsal user is logged in
-
+        $admin = Auth::user();
+        $futsal = Auth::guard('futsal')->user();
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'author' => 'nullable|string|max:100',
-            'location' => 'nullable|string|max:100',
-            'date_created' => 'required|date',
+            'location' => 'required|string|max:100',
         ]);
 
-        // Set author automatically if futsal user
-        if ($guard) {
-            $validated['author'] = $guard->name; // assuming futsal model has name field
-        } elseif ($user && $user->is_admin) {
-            $validated['author'] = $request->author ?? 'Admin';
+        if ($futsal) {
+            $validated['author'] = $futsal->name;  
+            $validated['role'] = 'futsal';
+        } elseif ($admin && $admin->is_admin) {
+            $validated['author'] = $admin->name ?? 'Admin';
+            $validated['role'] = 'admin';
+        } else {
+            return back()->with('error', 'Unauthorized access.');
         }
 
-        // Optionally, store role
-        $validated['role'] = $guard ? 'futsal' : 'admin';
-
+        $validated['date_created'] = now();
         Blog::create($validated);
-
-        if ($guard) {
-            return redirect()->route('futsal.index')->with('success', 'Blog created successfully!');
+        if ($futsal) {
+            return redirect()->route('futsal.index')
+                ->with('success', 'Blog created successfully!');
         }
 
-        return redirect()->route('admin.blogs.index')->with('success', 'Blog created successfully!');
+        return redirect()->route('admin.blogs.index')
+            ->with('success', 'Blog created successfully!');
     }
+
 
     public function edit(Blog $blog)
     {

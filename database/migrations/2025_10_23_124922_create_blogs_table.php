@@ -13,7 +13,7 @@ return new class extends Migration {
             $table->text('content');
             $table->string('author')->nullable();
             $table->string('location')->nullable();
-            $table->date('date_created');
+            $table->timestamp('date_created')->useCurrent();
             $table->timestamps();
         });
     }

@@ -12,10 +12,16 @@ class Blog extends Model
     protected $fillable = [
         'title',
         'content',
-        'author',
         'location',
+        'author',
         'date_created',
     ];
 
     protected $dates = ['date_created'];
+    protected static function booted()
+    {
+        static::creating(function ($blog) {
+            $blog->date_created = now(); 
+        });
+    }
 }
