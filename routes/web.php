@@ -43,7 +43,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::prefix('futsal')->group(function () {
     Route::get('/', [FutsalController::class, 'index'])->name('futsal.index');
-    Route::get('/{id}', [FutsalController::class, 'show'])->name('futsal.show');
 
     Route::middleware(['auth:futsal'])->group(function () {
         Route::get('/home', [FutsalController::class, 'dashboard'])->name('futsal.home');
@@ -57,7 +56,10 @@ Route::prefix('futsal')->group(function () {
         Route::get('/blogs/create', [BlogController::class, 'create'])->name('futsal.blogs.create');
         Route::post('/blogs', [BlogController::class, 'store'])->name('futsal.blogs.store');
     });
+
+    Route::get('/{id}', [FutsalController::class, 'show'])->name('futsal.show');
 });
+
 
 // ===========================
 // Bookings
