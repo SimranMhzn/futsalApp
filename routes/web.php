@@ -40,8 +40,6 @@ Route::post('/login/admin', [AuthController::class, 'loginAdmin']);
 // Logout
 // ===========================
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-
 Route::prefix('futsal')->group(function () {
     Route::get('/', [FutsalController::class, 'index'])->name('futsal.index');
 
@@ -54,10 +52,16 @@ Route::prefix('futsal')->group(function () {
         Route::delete('/{futsal}', [FutsalController::class, 'destroy'])->name('futsal.destroy');
         Route::get('/profile', [AuthController::class, 'profile'])->name('futsal.profile');
         Route::get('/futsal/my-status', [FutsalController::class, 'myFutsalStatus'])->name('futsal.my-status');
+
         Route::get('/blogs/create', [BlogController::class, 'create'])->name('futsal.blogs.create');
         Route::post('/blogs', [BlogController::class, 'store'])->name('futsal.blogs.store');
+
+       Route::get('/history', [BookingController::class, 'futsalHistory'])
+        ->middleware('auth:futsal')
+        ->name('futsal.booking.history');
     });
 
+    // ⚠️ Keep this LAST
     Route::get('/{id}', [FutsalController::class, 'show'])->name('futsal.show');
 });
 

@@ -50,8 +50,9 @@
                 @elseif($role === 'futsal')
                     <!-- Futsal Links -->
                     <li><a href="{{ route('futsal.home') }}" class="hover:text-yellow-300">Dashboard</a></li>
-                    <li><a href="{{ route('futsal.profile') }}" class="hover:text-yellow-300">Profile</a></li>
+                    <li><a href="{{ route('futsal.booking.history') }}" class="hover:text-yellow-300">Booking History</a></li>
 
+                    <li><a href="{{ route('futsal.profile') }}" class="hover:text-yellow-300">Futsal Profile</a></li>
                 @endif
             @endguest
 
