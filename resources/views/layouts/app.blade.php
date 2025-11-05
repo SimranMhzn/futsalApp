@@ -38,8 +38,7 @@
                     <!-- Admin Links -->
                     <li><a href="{{ route('admin.blogs.index') }}" class="hover:text-yellow-300">Blogs</a></li>
                     <li><a href="{{ route('futsal.index') }}" class="hover:text-yellow-300">Futsals</a></li>
-                    <li><a href="{{ route('admin.futsals.pending') }}" class="hover:text-yellow-300">Futsals Request</a>
-                    </li>
+                    <li><a href="{{ route('admin.futsals.pending') }}" class="hover:text-yellow-300">Futsals Request</a></li>
                     <li><a href="{{ url('/profile') }}" class="hover:text-yellow-300">Profile</a></li>
                 @elseif($role === 'user')
                     <!-- Normal User Links -->

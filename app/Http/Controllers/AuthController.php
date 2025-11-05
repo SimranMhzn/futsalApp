@@ -69,6 +69,7 @@ class AuthController extends Controller
      * ------------------------------ */
     public function registerFutsal(Request $request)
     {
+        // 1. Validate all fields including hour/minute
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
@@ -97,6 +98,9 @@ class AuthController extends Controller
         $data = $request->all();
         $data['user_id'] = Auth::id();
         $data['status'] = 'pending';
+
+        $data['open_time'] = $data['open_time'] . ':00';
+        $data['close_time'] = $data['close_time'] . ':00';
 
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('futsal_photos', 'public');
