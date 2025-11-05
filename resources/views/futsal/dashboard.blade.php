@@ -7,12 +7,8 @@
 </section>
 
 <div class="max-w-6xl mx-auto py-10 px-6">
-    <div class="grid md:grid-cols-2 gap-8">
-        <a href="{{ route('futsal.create') }}"
-           class="block bg-white p-6 rounded-2xl shadow hover:shadow-lg transition duration-300 text-center">
-            <h2 class="text-xl font-bold text-green-700 mb-2">➕ Add New Futsal</h2>
-            <p class="text-gray-600">List a new futsal facility for players to find and book.</p>
-        </a>
+    <div class="flex justify-center gap-6 flex-wrap">
+        
 
         <a href="{{ route('futsal.blogs.create') }}"
            class="block bg-white p-6 rounded-2xl shadow hover:shadow-lg transition duration-300 text-center">
