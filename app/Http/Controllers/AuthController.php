@@ -89,6 +89,8 @@ class AuthController extends Controller
                 'regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
             ],
             'price' => 'required|numeric',
+            'open_time' => 'required',
+            'close_time' => 'required',
         ], [
             'email.regex' => 'Email must be a valid Gmail address.',
             'phone.digits' => 'Phone number must be exactly 10 digits.',
@@ -99,8 +101,9 @@ class AuthController extends Controller
         $data['user_id'] = Auth::id();
         $data['status'] = 'pending';
 
-        $data['open_time'] = $data['open_time'] . ':00';
-        $data['close_time'] = $data['close_time'] . ':00';
+        $data['open_time'] .= ':00';
+        $data['close_time'] .= ':00';
+
 
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('futsal_photos', 'public');
