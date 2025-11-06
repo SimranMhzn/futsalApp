@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Futsal;
+use App\Models\Blog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -36,7 +37,16 @@ class FutsalController extends Controller
     public function dashboard()
     {
         $futsal = auth()->guard('futsal')->user();
-        return view('futsal.dashboard', compact('futsal'));
+
+        // Load blogs authored by this futsal so the dashboard only shows relevant posts.
+        $blogs = collect();
+        if ($futsal) {
+            $blogs = Blog::where('author', $futsal->name)
+                ->orderBy('date_created', 'desc')
+                ->get();
+        }
+
+        return view('futsal.dashboard', compact('futsal', 'blogs'));
     }
 
 
