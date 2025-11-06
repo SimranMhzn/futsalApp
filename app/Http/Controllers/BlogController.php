@@ -5,17 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Blog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class BlogController extends Controller
 {
     public function __construct()
     {
-        // Public access for index and show
-        $this->middleware('auth')->except(['index', 'show']);
-
         // Admin-only access for admin management actions (adminIndex, edit, update, destroy)
-        // Note: create/store are intentionally not restricted here so they can be
-        // reached by route-level middleware for futsal (auth:futsal) or admin (auth,admin).
+        // NOTE: We intentionally do NOT attach the generic 'auth' middleware here because
+        // futsal routes use the 'auth:futsal' guard at the route level. Having a global
+        // 'auth' middleware would prevent futsal-guarded routes from working.
         $this->middleware('admin')->only(['adminIndex', 'edit', 'update', 'destroy']);
     }
 
@@ -27,7 +26,7 @@ class BlogController extends Controller
     {
         $blogs = Blog::orderBy('date_created', 'desc')->get();
 
-        if (auth()->check() && auth()->user()->is_admin) {
+        if (auth()->check() && auth()->user()->role === 'admin') {
             return view('admin.blogs.index', compact('blogs'));
         }
 
@@ -38,8 +37,9 @@ class BlogController extends Controller
     {
         $blog = Blog::findOrFail($id);
 
-        if (auth()->check() && auth()->user()->is_admin) {
-            return view('admin.blog.show', compact('blog'));
+        if (auth()->check() && auth()->user()->role === 'admin') {
+            // admin views are under admin.blogs.*
+            return view('admin.blogs.show', compact('blog'));
         }
 
         return view('blogs.show', compact('blog'));
@@ -52,7 +52,7 @@ class BlogController extends Controller
     public function create()
     {
         // If an admin is logged in via the default guard, show admin create view
-        if (auth()->check() && auth()->user()->is_admin) {
+        if (auth()->check() && auth()->user()->role === 'admin') {
             return view('admin.blogs.create');
         }
 
@@ -73,6 +73,15 @@ class BlogController extends Controller
 
     public function store(Request $request)
     {
+        // Debug: log auth state at the start of store to help track unexpected logouts
+        Log::info('BlogController@store called', [
+            'auth_check_default' => Auth::check(),
+            'auth_user_default_id' => optional(Auth::user())->id,
+            'auth_guard_futsal_check' => Auth::guard('futsal')->check(),
+            'auth_guard_futsal_id' => optional(Auth::guard('futsal')->user())->id,
+            'session_id' => $request->session()->getId(),
+        ]);
+
         $admin = Auth::user();
         $futsal = Auth::guard('futsal')->user();
         $validated = $request->validate([
@@ -80,19 +89,33 @@ class BlogController extends Controller
             'content' => 'required|string',
             'location' => 'required|string|max:100',
         ]);
-
+        // Build only the attributes that exist on the blogs table / model
         if ($futsal) {
-            $validated['author'] = $futsal->name;  
-            $validated['role'] = 'futsal';
-        } elseif ($admin && $admin->is_admin) {
-            $validated['author'] = $admin->name ?? 'Admin';
-            $validated['role'] = 'admin';
+            $author = $futsal->name;
+        } elseif ($admin && ($admin->role ?? null) === 'admin') {
+            $author = $admin->name ?? 'Admin';
         } else {
             return back()->with('error', 'Unauthorized access.');
         }
 
-        $validated['date_created'] = now();
-        Blog::create($validated);
+        $blogData = [
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'location' => $validated['location'],
+            'author' => $author,
+            'date_created' => now(),
+        ];
+
+        Blog::create($blogData);
+
+        // Log after create to capture state post-write
+        Log::info('BlogController@store completed create', [
+            'auth_check_default_post' => Auth::check(),
+            'auth_user_default_id_post' => optional(Auth::user())->id,
+            'auth_guard_futsal_check_post' => Auth::guard('futsal')->check(),
+            'auth_guard_futsal_id_post' => optional(Auth::guard('futsal')->user())->id,
+            'session_id_post' => $request->session()->getId(),
+        ]);
         if ($futsal) {
             return redirect()->route('futsal.index')
                 ->with('success', 'Blog created successfully!');

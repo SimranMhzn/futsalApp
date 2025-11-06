@@ -26,7 +26,7 @@
             @foreach($blogs as $blog)
                 <div class="bg-white p-4 rounded-lg shadow">
                     <a href="{{ route('blog.show', $blog->id) }}" class="text-lg font-bold text-green-700 hover:underline">{{ $blog->title }}</a>
-                    <p class="text-sm text-gray-500 mt-1">{{ $blog->date_created->format('M d, Y') ?? '' }}</p>
+                    <p class="text-sm text-gray-500 mt-1">{{ $blog->date_created ? \Carbon\Carbon::parse($blog->date_created)->format('M d, Y') : '' }}</p>
                     <p class="text-gray-700 mt-2">{{ \Illuminate\Support\Str::limit(strip_tags($blog->content), 150) }}</p>
                 </div>
             @endforeach
