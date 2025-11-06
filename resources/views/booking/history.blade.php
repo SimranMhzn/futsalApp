@@ -39,7 +39,12 @@
                             </td>
                             <td class="py-3 px-4">
                                 <div class="flex space-x-2">
-                                    <button onclick="openUpdateModal({{ $booking->id }}, '{{ $booking->date }}', '{{ \Carbon\Carbon::parse($booking->start_time)->format('H') }}', '{{ \Carbon\Carbon::parse($booking->end_time)->format('H') }}')" 
+                                    <button onclick="openUpdateModal(
+                                        {{ $booking->id }},
+                                        '{{ $booking->date }}',
+                                        '{{ \Carbon\Carbon::parse($booking->start_time)->format('H:i') }}',
+                                        '{{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}'
+                                    )"
                                         class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
                                         Update
                                     </button>
@@ -73,7 +78,7 @@
         <form id="updateForm" method="POST">
             @csrf
             @method('PUT')
-            
+
             {{-- Date Picker --}}
             <div class="mb-4">
                 <label class="block mb-1 font-medium text-gray-700">Select Date:</label>
@@ -82,26 +87,28 @@
                     required min="{{ date('Y-m-d') }}">
             </div>
 
-            {{-- Time Slots --}}
+            {{-- Start Time Picker --}}
             <div class="mb-4">
-                <label class="block mb-1 font-medium text-gray-700">Select Time:</label>
-                <div class="grid grid-cols-3 gap-2" id="updateTimeSlots">
-                    @php
-                        $hours = [
-                            '6-7', '7-8', '8-9', '9-10', '10-11', '11-12',
-                            '12-13', '13-14', '14-15', '15-16', '16-17',
-                            '17-18', '18-19', '19-20', '20-21',
-                        ];
-                    @endphp
-                    @foreach ($hours as $hour)
-                        <button type="button"
-                            class="update-time-btn bg-green-50 text-green-700 px-2 py-2 rounded text-sm font-medium transition hover:bg-green-100"
-                            data-start="{{ explode('-', $hour)[0] }}" data-end="{{ explode('-', $hour)[1] }}">
-                            {{ $hour }}
-                        </button>
-                    @endforeach
-                </div>
+                <label class="block mb-1 font-medium text-gray-700">Select Start Time:</label>
+                <input type="text" id="updateStartTimeInput" placeholder="Select Start Time"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required>
             </div>
+
+            {{-- Duration Dropdown --}}
+            <div class="mb-4">
+                <label class="block mb-1 font-medium text-gray-700">Select Duration (hours):</label>
+                <select id="updateDurationSelect" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <option value="">-- Select Duration --</option>
+                    <option value="1">1 hour</option>
+                    <option value="2">2 hours</option>
+                    <option value="3">3 hours</option>
+                </select>
+            </div>
+
+            {{-- Validation Messages --}}
+            <p id="updateDateError" class="text-red-600 text-sm hidden mb-1">Please select a valid date (today or later).</p>
+            <p id="updateTimeError" class="text-red-600 text-sm hidden mb-1">Start time or duration is invalid. Booking exceeds futsal closing time.</p>
+            <p id="updateDurationError" class="text-red-600 text-sm hidden mb-2">Please select a valid duration.</p>
 
             <input type="hidden" name="start_time" id="update_start_time">
             <input type="hidden" name="end_time" id="update_end_time">
@@ -120,102 +127,160 @@
     </div>
 </div>
 
+{{-- Flatpickr + Validation JS --}}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    const updateModal = document.getElementById('updateModal');
-    const updateForm = document.getElementById('updateForm');
-    const updateDateInput = document.getElementById('updateDate');
-    const updateTimeButtons = document.querySelectorAll('.update-time-btn');
-    const updateBookButton = document.getElementById('updateBookButton');
-    const updateStartTimeInput = document.getElementById('update_start_time');
-    const updateEndTimeInput = document.getElementById('update_end_time');
+const updateForm = document.getElementById('updateForm');
+const updateDateInput = document.getElementById('updateDate');
+const startInput = document.getElementById('updateStartTimeInput');
+const durationSelect = document.getElementById('updateDurationSelect');
+const updateStartHidden = document.getElementById('update_start_time');
+const updateEndHidden = document.getElementById('update_end_time');
 
-    let updateSelectedDate = null;
-    let updateSelectedStart = null;
-    let updateSelectedEnd = null;
+const dateError = document.getElementById('updateDateError');
+const timeError = document.getElementById('updateTimeError');
+const durationError = document.getElementById('updateDurationError');
+const updateBookButton = document.getElementById('updateBookButton');
 
-    function openUpdateModal(bookingId, date, startTime, endTime) {
-        updateModal.classList.remove('hidden');
-        updateModal.classList.add('flex');
-        
-        // Set form action
-        updateForm.action = `/booking/${bookingId}`;
-        
-        // Set date
-        updateDateInput.value = date;
-        updateSelectedDate = date;
-        
-        // Highlight selected time slot
-        updateTimeButtons.forEach(btn => {
-            btn.classList.remove('bg-green-700', 'text-white');
-            btn.classList.add('bg-green-50', 'text-green-700');
-            
-            if (btn.dataset.start === startTime && btn.dataset.end === endTime) {
-                btn.classList.add('bg-green-700', 'text-white');
-                btn.classList.remove('bg-green-50', 'text-green-700');
-            }
-        });
-        
-        updateSelectedStart = startTime;
-        updateSelectedEnd = endTime;
-        updateStartTimeInput.value = startTime;
-        updateEndTimeInput.value = endTime;
-        
-        toggleUpdateButton();
+// Set futsal hours (replace with actual futsal hours if needed)
+const futsalOpen = "{{ $futsal->open_time ?? '06:00' }}";
+const futsalClose = "{{ $futsal->close_time ?? '21:00' }}";
+
+// Initialize Flatpickr
+flatpickr("#updateStartTimeInput", {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: "H:i",
+    minuteIncrement: 15,
+    allowInput: true,
+    minTime: futsalOpen,
+    maxTime: futsalClose
+});
+
+// Function to calculate end_time and update hidden fields
+function updateEndTime() {
+    const startTime = startInput.value; // Flatpickr input value
+    const duration = parseInt(durationSelect.value);
+
+    if (startTime && duration) {
+        const [hour, minute] = startTime.split(':').map(Number);
+        const start = new Date();
+        start.setHours(hour, minute, 0, 0);
+
+        // Calculate end time
+        const end = new Date(start.getTime() + duration * 60 * 60 * 1000);
+
+        // Update hidden fields
+        updateStartHidden.value = startTime;
+        updateEndHidden.value = end.toTimeString().slice(0,5);
     }
+}
 
-    function closeUpdateModal() {
-        updateModal.classList.add('hidden');
-        updateModal.classList.remove('flex');
-        updateSelectedDate = null;
-        updateSelectedStart = null;
-        updateSelectedEnd = null;
-    }
+// Validate modal form
+function validateUpdateForm() {
+    let valid = true;
 
-    // Handle date change
-    updateDateInput.addEventListener('change', function() {
-        updateSelectedDate = this.value;
-        toggleUpdateButton();
-    });
+    // Date validation
+    const today = new Date();
+    const selectedDate = new Date(updateDateInput.value);
+    if(!updateDateInput.value || selectedDate < new Date(today.toDateString())) {
+        dateError.classList.remove('hidden');
+        valid = false;
+    } else dateError.classList.add('hidden');
 
-    // Handle time selection
-    updateTimeButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            updateTimeButtons.forEach(b => b.classList.remove('bg-green-700', 'text-white'));
-            updateTimeButtons.forEach(b => b.classList.add('bg-green-50', 'text-green-700'));
+    // Duration validation
+    const duration = parseInt(durationSelect.value);
+    if(!duration) {
+        durationError.classList.remove('hidden');
+        valid = false;
+    } else durationError.classList.add('hidden');
 
-            this.classList.add('bg-green-700', 'text-white');
-            this.classList.remove('bg-green-50', 'text-green-700');
+    // Time validation
+    const startTime = startInput.value;
+    if(!startTime) {
+        timeError.classList.remove('hidden');
+        valid = false;
+    } else {
+        const [hour, minute] = startTime.split(':').map(Number);
+        const start = new Date();
+        start.setHours(hour, minute);
 
-            updateSelectedStart = this.dataset.start;
-            updateSelectedEnd = this.dataset.end;
-            updateStartTimeInput.value = updateSelectedStart;
-            updateEndTimeInput.value = updateSelectedEnd;
+        const end = new Date(start.getTime() + duration * 60 * 60 * 1000);
 
-            toggleUpdateButton();
-        });
-    });
+        const [closeHour, closeMinute] = futsalClose.split(':').map(Number);
+        const closeTime = new Date();
+        closeTime.setHours(closeHour, closeMinute);
 
-    function toggleUpdateButton() {
-        if (updateSelectedDate && updateSelectedStart && updateSelectedEnd) {
-            updateBookButton.disabled = false;
-            updateBookButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
-            updateBookButton.classList.add('bg-green-600', 'hover:bg-green-700', 'cursor-pointer');
+        const [openHour, openMinute] = futsalOpen.split(':').map(Number);
+        const openTime = new Date();
+        openTime.setHours(openHour, openMinute);
+
+        if(start < openTime || end > closeTime) {
+            timeError.classList.remove('hidden');
+            valid = false;
         } else {
-            updateBookButton.disabled = true;
-            updateBookButton.classList.add('bg-gray-400', 'cursor-not-allowed');
-            updateBookButton.classList.remove('bg-green-600', 'hover:bg-green-700', 'cursor-pointer');
+            timeError.classList.add('hidden');
+            updateStartHidden.value = startTime;
+            updateEndHidden.value = end.toTimeString().slice(0,5);
         }
     }
 
-    // Close modal when clicking outside
-    updateModal.addEventListener('click', function(e) {
-        if (e.target === updateModal) {
-            closeUpdateModal();
-        }
-    });
+    // Enable/disable update button
+    if(valid) {
+        updateBookButton.disabled = false;
+        updateBookButton.classList.remove('bg-gray-400','cursor-not-allowed');
+        updateBookButton.classList.add('bg-green-600','hover:bg-green-700','cursor-pointer');
+    } else {
+        updateBookButton.disabled = true;
+        updateBookButton.classList.add('bg-gray-400','cursor-not-allowed');
+        updateBookButton.classList.remove('bg-green-600','hover:bg-green-700','cursor-pointer');
+    }
+}
 
-    // Set minimum date
-    const today = new Date().toISOString().split('T')[0];
-    updateDateInput.setAttribute('min', today);
+// Event listeners
+updateDateInput.addEventListener('input', validateUpdateForm);
+startInput.addEventListener('input', () => {
+    updateEndTime();
+    validateUpdateForm();
+});
+durationSelect.addEventListener('change', () => {
+    updateEndTime();
+    validateUpdateForm();
+});
+updateForm.addEventListener('submit', function(e){
+    validateUpdateForm();
+    if(updateBookButton.disabled) e.preventDefault();
+});
+
+// Modal open/close
+const updateModal = document.getElementById('updateModal');
+function openUpdateModal(bookingId, date, startTime, endTime) {
+    updateModal.classList.remove('hidden');
+    updateModal.classList.add('flex');
+    updateForm.action = `/booking/${bookingId}`;
+
+    // Set date
+    updateDateInput.value = date;
+
+    // Set start time in flatpickr
+    startInput._flatpickr.setDate(startTime);
+
+    // Calculate duration
+    const [sh, sm] = startTime.split(':').map(Number);
+    const [eh, em] = endTime.split(':').map(Number);
+    const duration = (parseInt(eh) - parseInt(sh)) + ((parseInt(em) - parseInt(sm))/60);
+    durationSelect.value = duration;
+
+    updateEndTime();
+    validateUpdateForm();
+}
+
+function closeUpdateModal() {
+    updateModal.classList.add('hidden');
+    updateModal.classList.remove('flex');
+}
+
+// Set minimum date
+updateDateInput.setAttribute('min', new Date().toISOString().split('T')[0]);
 </script>
 @endsection

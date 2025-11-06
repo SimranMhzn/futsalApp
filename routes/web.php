@@ -77,7 +77,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/bookings', [BookingController::class, 'store'])->name('booking.store');
     Route::get('/bookings/history', [BookingController::class, 'history'])->name('booking.history');
     Route::get('/booking/{futsal}', [BookingController::class, 'create'])->name('booking.create');
-    Route::put('/booking/{futsal}', [BookingController::class, 'update'])->name('booking.update');
+    Route::put('/booking/{booking}', [BookingController::class, 'update'])->name('booking.update');
 });
 
 // ===========================
