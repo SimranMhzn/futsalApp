@@ -17,4 +17,22 @@
         </a>
     </div>
 </div>
+ 
+<div class="max-w-6xl mx-auto py-6 px-6">
+    <h2 class="text-2xl font-semibold mb-4">Your Blogs</h2>
+
+    @if(!empty($blogs) && $blogs->count())
+        <div class="space-y-4">
+            @foreach($blogs as $blog)
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <a href="{{ route('blog.show', $blog->id) }}" class="text-lg font-bold text-green-700 hover:underline">{{ $blog->title }}</a>
+                    <p class="text-sm text-gray-500 mt-1">{{ $blog->date_created->format('M d, Y') ?? '' }}</p>
+                    <p class="text-gray-700 mt-2">{{ \Illuminate\Support\Str::limit(strip_tags($blog->content), 150) }}</p>
+                </div>
+            @endforeach
+        </div>
+    @else
+        <p class="text-gray-600">You haven't published any blogs yet. Use "Write Blog" to create your first post.</p>
+    @endif
+</div>
 @endsection

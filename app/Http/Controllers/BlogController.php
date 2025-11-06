@@ -13,8 +13,10 @@ class BlogController extends Controller
         // Public access for index and show
         $this->middleware('auth')->except(['index', 'show']);
 
-        // Admin-only access for CRUD
-        $this->middleware('admin')->only(['create', 'store', 'edit', 'update', 'destroy']);
+        // Admin-only access for admin management actions (adminIndex, edit, update, destroy)
+        // Note: create/store are intentionally not restricted here so they can be
+        // reached by route-level middleware for futsal (auth:futsal) or admin (auth,admin).
+        $this->middleware('admin')->only(['adminIndex', 'edit', 'update', 'destroy']);
     }
 
     // -------------------------
@@ -49,6 +51,17 @@ class BlogController extends Controller
 
     public function create()
     {
+        // If an admin is logged in via the default guard, show admin create view
+        if (auth()->check() && auth()->user()->is_admin) {
+            return view('admin.blogs.create');
+        }
+
+        // If a futsal is logged in via futsal guard, return the public blogs.create
+        if (\Illuminate\Support\Facades\Auth::guard('futsal')->check()) {
+            return view('blogs.create');
+        }
+
+        // Fallback to admin create (route-level middleware should normally prevent reaching here)
         return view('admin.blogs.create');
     }
 
